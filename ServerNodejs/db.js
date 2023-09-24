@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 // }
 
 module.exports = {
-    db_url: 'mongodb+srv://hoanglong180903:admin@atlascluster.311pkoc.mongodb.net/QuanLyThuVien'
+    db_url: 'mongodb+srv://hantnph28876:1234@cluster0.fwxkt48.mongodb.net/QuanLyDuAnAgile'
 }
 
 
