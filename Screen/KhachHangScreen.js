@@ -1,6 +1,7 @@
-import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import { StyleSheet,ImageBackground, Text, View , Image } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
+
 const styles = StyleSheet.create({
   root: { flex: 1 },
   container: { flex: 1, justifyContent: "flex-start" },
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
-export default function ManHinhChinh() {
+export default function KhachHangScreen() {
   return (
     <View style={styles.root}>
       <StatusBar hidden />

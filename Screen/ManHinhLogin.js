@@ -39,10 +39,9 @@ export default function ManHinhLogin(props) {
             else if(result[0].username != userName){
                 Alert.alert('Thông báo!', 'Sai username');
             }else{
-                Alert.alert('Thông báo!', 'Đăng nhập thành công');
                 console.log("Successfully")
                 await AsyncStorage.setItem("token",JSON.stringify(result));
-                props.navigation.navigate('Màn Hình Chính');
+                props.navigation.navigate('Menu');
             }
        })
        .catch(err => {
@@ -52,42 +51,6 @@ export default function ManHinhLogin(props) {
       
   }
 
-  // const doLogin = () => {
-  //   if (username.length == 0) {
-  //     alert("Chưa nhập username");
-  //     return;
-  //   }
-  //   if (password.length == 0) {
-  //     alert("Chưa nhập password");
-  //     return;
-  //   }
-
-  //       let url_check_login = `https://64b89a9421b9aa6eb079f300.mockapi.io/nguoidung` + username;
-  //       fetch( url_check_login)
-  //       .then ( (res) => {return res.json()})
-  //       .then ( async(res_login) =>{
-  //         console.log(res_login[0].username);
-  //         if(res_login.length != 1)
-  //         {
-  //           alert("sai username hoặc lỗi trùng lặp dữ liệu");
-  //           return;
-  //         }else{
-  //           let objU = res_login[0];
-  //           if(objU.password != password){
-  //             alert("Sai password");
-  //             return;
-  //           }else{
-  //             try {
-  //               await AsyncStorage.setItem('loginInfo', json.stringify(objU));
-  //                 props.navigation.navigate('ManHinhChao')
-  //             } catch (e) {
-  //               // saving error
-  //               console.log(e);
-  //             }
-  //           }
-  //         }
-  //       })
-  //     }
 
   
   return (
