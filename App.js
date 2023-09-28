@@ -10,6 +10,7 @@ const Stack = createNativeStackNavigator();
 import ManHinhChao from './Screen/ManHinhChao';
 import ManHinhLogin from './Screen/ManHinhLogin';
 import ManHinhChinh  from './Screen/ManHinhChinh';
+import QuanLyPhong from './Screen/QuanLyPhong';
 export default function App() {
   return (
     <NavigationContainer>
@@ -21,6 +22,9 @@ export default function App() {
         <Stack.Screen name='Màn Hình Chính' component=
         {ManHinhChinh}
         options={{ headerShown: false, gestureEnabled: false }}/>
+
+        <Stack.Screen name='Quản Lý Phòng' component={QuanLyPhong} options={{ headerShown: false, gestureEnabled: false }}/>
+
       </Stack.Navigator>
     </NavigationContainer>
     

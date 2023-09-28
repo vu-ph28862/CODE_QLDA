@@ -68,8 +68,8 @@ app.post('/insertPhong', (req,res) => {
 
 app.get('/getPhong', async (req,res) => {
   try {
-    const books = await Phong.find().populate('maLoaiPhong'); // maLoaiSach là thuộc tính của Sách
-    res.json(books);
+    const phong = await Phong.find().populate('maLoaiPhong'); // maLoaiPhong là thuộc tính của Phòng
+    res.json(phong);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -103,6 +103,31 @@ app.put('/updatePhong/:id', async (req,res) => {
     return res.status(500).json({message: err.message})
   }
 })
+// API để lấy danh sách phòng theo loại phòng
+// app.get('/getTheoLoaiPhong/:loaiPhong', async (req, res) => {
+//   // const loaiPhong = req.params.loaiPhong;
+//   // const filteredRooms = Phong.filter(phong => phong.maLoaiPhong._id === loaiPhong);
+//   // res.json(filteredRooms);
+
+//   try {
+//     const roomTypeId = req.params.maLoaiPhong;
+//     // Truy vấn danh sách phòng theo mã loại phòng
+//     const rooms = await Phong.find({ type: maLoaiPhong }).exec();
+//     res.json(rooms);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+// app.get('/getTheoLoaiPhong/:loaiPhong', async (req, res) => {
+//   try {
+//     const roomTypeId = req.params.roomTypeId;
+//     const rooms = await Phong.find({ maLoaiPhong: roomTypeId }).populate('maLoaiPhong', 'name');
+//     res.json(rooms);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
+//   }
+// });
 
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
