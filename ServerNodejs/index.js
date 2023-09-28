@@ -104,30 +104,16 @@ app.put('/updatePhong/:id', async (req,res) => {
   }
 })
 // API để lấy danh sách phòng theo loại phòng
-// app.get('/getTheoLoaiPhong/:loaiPhong', async (req, res) => {
-//   // const loaiPhong = req.params.loaiPhong;
-//   // const filteredRooms = Phong.filter(phong => phong.maLoaiPhong._id === loaiPhong);
-//   // res.json(filteredRooms);
+app.get('/getTheoLoaiPhong/:id', async (req, res) => {
+  try {
+    const roomTypeId = req.params.id;
+    const rooms = await Phong.find({ maLoaiPhong: roomTypeId }).populate('maLoaiPhong', '_id').populate('maLoaiPhong');
+    res.json(rooms);
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
+  }
+});
 
-//   try {
-//     const roomTypeId = req.params.maLoaiPhong;
-//     // Truy vấn danh sách phòng theo mã loại phòng
-//     const rooms = await Phong.find({ type: maLoaiPhong }).exec();
-//     res.json(rooms);
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-// app.get('/getTheoLoaiPhong/:loaiPhong', async (req, res) => {
-//   try {
-//     const roomTypeId = req.params.roomTypeId;
-//     const rooms = await Phong.find({ maLoaiPhong: roomTypeId }).populate('maLoaiPhong', 'name');
-//     res.json(rooms);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
-//   }
-// });
 
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
