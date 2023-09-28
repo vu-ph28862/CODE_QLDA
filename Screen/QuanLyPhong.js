@@ -83,31 +83,6 @@ export default function QuanLyPhong({ navigation }) {
         }
         console.log("Phòng: " + tenPhong + " / " + tinhTrang + " / " + selectLoaiPhong + " / " + tienThueTheoGio + " / " + tienThueTheoNgay)
 
-        // var myHeaders = new Headers();
-        // myHeaders.append("Content-Type", "application/json");
-
-
-        // var requestOptions = {
-        //     method: 'POST',
-        //     headers: myHeaders,
-        //     body: JSON.stringify(phong),
-        //     redirect: 'follow'
-        // };
-
-        // fetch(`http://${hostname}:3000/insertPhong`, requestOptions)
-        //     .then(response => response.json())
-        //     .then(result => {
-        //         getListPhong();
-        //         setModalVisible(!modalVisible)
-        //         Alert.alert("Them thanh cong");
-        //         // setTenPhong("");
-        //         // setTienThueTheoGio("");
-        //         // setTienThueTheoNgay("");
-        //         // setTinhTrang("");
-        //         // setSelectLoaiPhong(null);
-        //         console.log(result)
-        //     })
-        //     .catch(error => console.log('error', error));
         fetch(`http://${hostname}:3000/insertPhong`, {
             method: 'POST',
             headers: {
@@ -146,7 +121,7 @@ export default function QuanLyPhong({ navigation }) {
             })
             .catch(error => console.log('error', error));
     }
-    //lấy loại sách đổ lên picker
+    //lấy loại phòng đổ lên picker
     const getLoaiPhong = () => {
         var requestOptions = {
             method: 'GET',
@@ -161,6 +136,25 @@ export default function QuanLyPhong({ navigation }) {
                     setMaLoaiPhong(response)
 
                 }
+            })
+            .catch(error => console.log('error', error));
+    }
+    const getTheoLoaiPhong = (_id) =>{
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+          };
+          
+          fetch(`http://${hostname}:3000/getTheoLoaiPhong/${_id}`, requestOptions)
+            .then(response => response.json())
+            .then(res => {
+                if (res) {
+                    console.log(res)
+                    setListPhong(res)
+                    setOldListPhong(res)
+                    setLoading(false)
+                }
+
             })
             .catch(error => console.log('error', error));
     }
@@ -306,12 +300,14 @@ export default function QuanLyPhong({ navigation }) {
                 {/* flatlist loại phòng */}
                 <View style={{ width: '100%' }}>
                     <FlatList
-                        style={{ marginLeft: 20 }}
+                        style={{ marginLeft: 20, marginRight:20 }}
                         data={maLoaiPhong}
                         horizontal={true} // Đặt horizontal thành true để danh sách nằm ngang
                         keyExtractor={(item) => item._id}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={()=>{}}>
+                            <TouchableOpacity onPress={()=>{
+                                getTheoLoaiPhong(item._id)
+                            }}>
                                 <Text style={{ borderWidth: 1, paddingTop: 3, paddingBottom: 3, paddingLeft: 10, paddingRight: 10, marginRight: 15, borderRadius: 20, backgroundColor: '#fff' }}>{item.tenLoaiPhong}</Text>
                             </TouchableOpacity>
                         )} />
@@ -331,7 +327,7 @@ export default function QuanLyPhong({ navigation }) {
                         <View
                             style={{
                                 flex: 0.5,
-                                height: 130,
+                                height: 140,
                                 marginLeft: index % 2 == 0 ? 10 : 0,
                                 marginTop: 5,
                                 marginRight: 10,
@@ -364,6 +360,7 @@ export default function QuanLyPhong({ navigation }) {
                                         }} />
 
                                 </View>
+                                <Text>{item.maLoaiPhong.tenLoaiPhong}</Text>
                                 <Text>Giá/giờ: {item.tienThueTheoGio} </Text>
                                 <Text>Giá/ngày: {item.tienThueTheoNgay}</Text>
 

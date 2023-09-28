@@ -9,7 +9,7 @@ import { Feather , MaterialIcons , FontAwesome , Fontisto ,MaterialCommunityIcon
 //import compoent
 import ManHinhLogin from './ManHinhLogin';
 import ManHinhChinh  from './ManHinhChinh';
-import QuanLyPhong from './PhongScreen';
+import QuanLyPhong from './QuanLyPhong';
 import QuanLyDatPhong from './DatPhongScreen';
 import LoaiDichVu from './LoaiDichVuScreen';
 import DichVu from './DichVuScreen';
