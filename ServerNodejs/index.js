@@ -74,8 +74,8 @@ app.post('/insertPhong', (req,res) => {
 
 app.get('/getPhong', async (req,res) => {
   try {
-    const books = await Phong.find().populate('maLoaiPhong'); // maLoaiSach là thuộc tính của Sách
-    res.json(books);
+    const phong = await Phong.find().populate('maLoaiPhong'); // maLoaiPhong là thuộc tính của Phòng
+    res.json(phong);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -109,6 +109,17 @@ app.put('/updatePhong/:id', async (req,res) => {
     return res.status(500).json({message: err.message})
   }
 })
+// API để lấy danh sách phòng theo loại phòng
+app.get('/getTheoLoaiPhong/:id', async (req, res) => {
+  try {
+    const roomTypeId = req.params.id;
+    const rooms = await Phong.find({ maLoaiPhong: roomTypeId }).populate('maLoaiPhong', '_id').populate('maLoaiPhong');
+    res.json(rooms);
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
+  }
+});
+
 
 
 
