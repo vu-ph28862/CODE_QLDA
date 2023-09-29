@@ -85,7 +85,7 @@ export default function DrawerNavigation() {
             color: "#111"
           },
         }}
-        // initialRouteName="Màn Hình Chính"
+        initialRouteName="Màn Hình Chính"
         >
         <Drawer.Screen name="Màn Hình Chính"
         options={{

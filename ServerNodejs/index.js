@@ -8,12 +8,18 @@ const mongoose = require('mongoose');
 require('./models/LoaiPhong')
 require('./models/Phong')
 
+///
+
+require('./models/KhachHang');
+
 const LoaiPhong = mongoose.model("loaiPhong")
 const Phong = mongoose.model("phong")
 
+//
+const KhachHang = mongoose.model("KhachHang");
 const port = 3000;
-// const hostname = '192.168.1.6'; //long
-const hostname = '192.168.126.1'; //hantnph28876
+const hostname = '192.168.1.6'; //long
+// const hostname = '192.168.126.1'; //hantnph28876
 app.use(bodyParser.json())
 
 const mongoURL= 'mongodb+srv://hantnph28876:1234@cluster0.fwxkt48.mongodb.net/QuanLyDuAnAgile'
@@ -113,6 +119,67 @@ app.get('/getTheoLoaiPhong/:id', async (req, res) => {
     res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
   }
 });
+
+
+
+
+
+
+//khachs hangf
+
+app.get('/getKhachHang', (req,res) => {
+  KhachHang.find({}).then(data => {
+    console.log(data)
+    res.send(data)
+  })
+})
+
+app.post('/insertKhachHang', (req,res) => {
+  const khachHang = new KhachHang({
+    tenKhachHang: req.body.tenKhachHang,
+    sdt : req.body.sdt,
+    cccd: req.body.cccd,
+    diaChi:req.body.diaChi,
+      })
+  khachHang.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.put("/updateKhachHang/:id", async (req, res ) => {
+  try{
+    const data = await KhachHang.findByIdAndUpdate(req.params.id , req.body , {new : true})
+    if(!data){
+      return res.status(404).json({
+        message:"update failed"
+      })
+    }
+    return res.status(200).json({
+        message:"update successfully"
+        
+      })
+  }catch(error){
+    return res.status(500).json({
+      message: error.message,
+    })
+  }
+})
+
+app.delete('/deleteKhachHang/:id', async (req,res) => {
+  try{
+    const data =  await KhachHang.findByIdAndDelete(req.params.id)
+    if(!data){
+      return res.status(404).json({message: "delete failed"})
+    }else{
+      return res.status(200).json({message: "delete successful"})
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+
+  }
+})
 
 
 
