@@ -28,7 +28,9 @@ import {
 
 export default function KhachHangScreen() {
   //hostname
-  const hostname = "192.168.1.6";
+  // const hostname = "192.168.1.6"; //long
+  const hostname = '192.168.126.1'; //hantnph28876
+
   // value compoent
   const [_id, setId] = useState();
   const [tenKhachHang, setTenKhachHang] = useState("");
@@ -116,8 +118,7 @@ export default function KhachHangScreen() {
     setSdt("");
     setCccd("");
     setDiaChi("");
-    setBtnLeft("");
-    setBtnRight("");
+    
     console.log(allInputValue);
   };
   //action update dữ liệu
@@ -166,8 +167,7 @@ export default function KhachHangScreen() {
     setSdt("");
     setCccd("");
     setDiaChi("");
-    setBtnLeft("");
-    setBtnRight("");
+    
     console.log(allInputValue);
   };
 

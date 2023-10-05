@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 require('./models/LoaiPhong')
 require('./models/Phong')
+require('./models/NhanVien')
 
 ///
 
@@ -14,12 +15,13 @@ require('./models/KhachHang');
 
 const LoaiPhong = mongoose.model("loaiPhong")
 const Phong = mongoose.model("phong")
+const NhanVien = mongoose.model("nhanVien")
 
 //
 const KhachHang = mongoose.model("KhachHang");
 const port = 3000;
-const hostname = '192.168.1.6'; //long
-// const hostname = '192.168.126.1'; //hantnph28876
+// const hostname = '192.168.1.6'; //long
+const hostname = '192.168.126.1'; //hantnph28876
 app.use(bodyParser.json())
 
 const mongoURL= 'mongodb+srv://hantnph28876:1234@cluster0.fwxkt48.mongodb.net/QuanLyDuAnAgile'
@@ -182,6 +184,59 @@ app.delete('/deleteKhachHang/:id', async (req,res) => {
 })
 
 
+
+//server nhân viên
+app.post('/insertNhanVien', (req,res) => {
+  const nhanVien = new NhanVien({
+    tenNhanVien: req.body.tenNhanVien,
+    sdt: req.body.sdt,
+    matKhau: req.body.matKhau,
+    chucVu: req.body.chucVu
+  })
+  nhanVien.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(Berr)})
+})
+
+app.get('/getNhanVien', async (req,res) => {
+  try {
+    const nhanVien = await NhanVien.find();
+    res.json(nhanVien);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+
+app.delete('/deleteNhanVien/:id', async (req,res) => {
+  try{
+    const data =  await NhanVien.findByIdAndDelete(req.params.id)
+    if(!data){
+      return res.status(404).json({message: "delete failed"})
+    }else{
+      return res.status(200).json({message: "delete successful"})
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+
+  }
+})
+
+app.put('/updateNhanVien/:id', async (req,res) => {
+  try{
+    const data = await NhanVien.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    if(!data){
+      return res.status(404).json({message: "update failed"})
+
+    }else{
+      return res.status(200).json({message: "update successful"})
+
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+  }
+})
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
 app.listen(port, hostname, () => {
