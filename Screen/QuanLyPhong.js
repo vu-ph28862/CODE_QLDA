@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, ImageBackground, TextInput, FlatList, TouchableOpacity, Modal, Button, Alert } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Image, ImageBackground, TextInput, FlatList, TouchableOpacity, Modal, Button, Alert, TouchableWithoutFeedback } from 'react-native'
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
@@ -8,13 +8,14 @@ import { Feather, MaterialIcons, FontAwesome, Fontisto, MaterialCommunityIcons, 
 //rnfs : tạo sẵn 
 export default function QuanLyPhong({ navigation }) {
     const hostname = '192.168.126.1'; //hantnph28876
-    //const hostname = "192.168.1.7"; //long
+    //const hostname = "192.168.1.6"; //long
 
     const [_id, setId] = useState();
     const [tenPhong, setTenPhong] = useState();
     const [tienThueTheoGio, setTienThueTheoGio] = useState();
     const [tienThueTheoNgay, setTienThueTheoNgay] = useState();
     //tình trạng trống phòng
+    //yes: trống, no: đã thuê
     const [tinhTrang, setTinhTrang] = useState("Yes");
 
     //mã loại phòng
@@ -29,6 +30,12 @@ export default function QuanLyPhong({ navigation }) {
     //mới
     const [btnLeft, setBtnLeft] = useState("");
     const [btnRight, setBtnRight] = useState("");
+
+    //check dialog chức năng
+    const [showDialogChucNang, setShowDiaLogChucNang] = useState(false);
+
+    //const set value title dialog
+    const [title, setTitle] = useState("");
 
     //search phòng
     const [search, setSearch] = useState("");
@@ -50,9 +57,10 @@ export default function QuanLyPhong({ navigation }) {
 
     //insert phong
     const insertPhong = () => {
+        
         const phong = {
             tenPhong: tenPhong,
-            tinhTrang: tinhTrang,
+            tinhTrang: "Yes",
             maLoaiPhong: selectLoaiPhong,
             tienThueTheoGio: tienThueTheoGio,
             tienThueTheoNgay: tienThueTheoNgay
@@ -76,10 +84,12 @@ export default function QuanLyPhong({ navigation }) {
         if (selectLoaiPhong === '') {
             Alert.alert("Thông báo", "Tên loại phòng không được để trống")
             return;
+
         }
         if (selectLoaiPhong === null) {
             Alert.alert("Thông báo", "Tên loại phòng không được để trống")
             return;
+
         }
         console.log("Phòng: " + tenPhong + " / " + tinhTrang + " / " + selectLoaiPhong + " / " + tienThueTheoGio + " / " + tienThueTheoNgay)
 
@@ -98,7 +108,8 @@ export default function QuanLyPhong({ navigation }) {
         setTienThueTheoGio("");
         setTienThueTheoNgay("");
         setSelectLoaiPhong(null);
-
+        setTinhTrang("Yes")
+        
     }
 
     //lấy danh sách phòng
@@ -139,13 +150,13 @@ export default function QuanLyPhong({ navigation }) {
             })
             .catch(error => console.log('error', error));
     }
-    const getTheoLoaiPhong = (_id) =>{
+    const getTheoLoaiPhong = (_id) => {
         var requestOptions = {
             method: 'GET',
             redirect: 'follow'
-          };
-          
-          fetch(`http://${hostname}:3000/getTheoLoaiPhong/${_id}`, requestOptions)
+        };
+
+        fetch(`http://${hostname}:3000/getTheoLoaiPhong/${_id}`, requestOptions)
             .then(response => response.json())
             .then(res => {
                 if (res) {
@@ -159,9 +170,10 @@ export default function QuanLyPhong({ navigation }) {
             .catch(error => console.log('error', error));
     }
 
-    //đổ dữ liệu lên dialog để update
+   
     const edit = (id, tenPhong, selectLoaiPhong, tienThueTheoGio, tienThueTheoNgay) => {
-        setModalVisible(!modalVisible)
+        // setModalVisible(!modalVisible)
+       
         setId(id)
         setTenPhong(tenPhong)
         setSelectLoaiPhong(selectLoaiPhong._id)
@@ -227,10 +239,14 @@ export default function QuanLyPhong({ navigation }) {
                 setTenPhong("");
                 setTienThueTheoGio("");
                 setTienThueTheoNgay("");
-                setTinhTrang("");
+                setTinhTrang("Yes");
+                
                 setSelectLoaiPhong(null);
+                
             })
             .catch(error => console.log('error', error));
+            
+            
 
     }
 
@@ -300,12 +316,12 @@ export default function QuanLyPhong({ navigation }) {
                 {/* flatlist loại phòng */}
                 <View style={{ width: '100%' }}>
                     <FlatList
-                        style={{ marginLeft: 20, marginRight:20 }}
+                        style={{ marginLeft: 20, marginRight: 20 }}
                         data={maLoaiPhong}
                         horizontal={true} // Đặt horizontal thành true để danh sách nằm ngang
                         keyExtractor={(item) => item._id}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={()=>{
+                            <TouchableOpacity onPress={() => {
                                 getTheoLoaiPhong(item._id)
                             }}>
                                 <Text style={{ borderWidth: 1, paddingTop: 3, paddingBottom: 3, paddingLeft: 10, paddingRight: 10, marginRight: 15, borderRadius: 20, backgroundColor: '#fff' }}>{item.tenLoaiPhong}</Text>
@@ -346,16 +362,14 @@ export default function QuanLyPhong({ navigation }) {
                             }}
 
                         >
-                            <View style={{ flexDirection: "column", height: "100%", flexDirection: "column", }}>
+                            <View style={{ flexDirection: "column", height: "100%" }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Text style={{ fontWeight: "bold", fontSize: 15, flex: 3 }}>
                                         {item.tenPhong}
                                     </Text>
                                     <MaterialCommunityIcons name="equal" size={30} color="black"
                                         onPress={() => {
-                                            setModalVisible(true),
-                                                setBtnLeft("Update"),
-                                                setBtnRight("Delete"),
+                                            setShowDiaLogChucNang(true),
                                                 edit(item._id, item.tenPhong, item.maLoaiPhong, item.tienThueTheoGio, item.tienThueTheoNgay);
                                         }} />
 
@@ -368,7 +382,7 @@ export default function QuanLyPhong({ navigation }) {
                                 <Text style={item.tinhTrang == 'Yes' ? styles.trongPhong : styles.khongTrongPhong}>
                                     {item.tinhTrang == 'Yes' ? 'Còn trống' : 'Đã thuê'}
                                 </Text>
-
+                                                
                             </View>
                         </View>
                     )}
@@ -377,157 +391,305 @@ export default function QuanLyPhong({ navigation }) {
                     animationType="slide"
                     transparent={true}
                     visible={modalVisible}
+                    style={styles.cardView}
                     onRequestClose={() => {
-                        setModalVisible(!modalVisible);
+                        this.setModalVisible(false);
                     }}
                 >
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            {/*dropdown chọn mã loại phòng */}
-                            <Picker
-                                mode="dropdown"
-                                selectedValue={selectLoaiPhong}
-                                onValueChange={(itemValue) => setSelectLoaiPhong(itemValue)}
-                                style={styles.dropdown}
-                            >
-                                {maLoaiPhong.map(category => (
-                                    <Picker.Item
-                                        key={category._id}
-                                        label={category.tenLoaiPhong}
-                                        value={category._id}
-                                    />
-                                ))}
-                            </Picker>
-                            {/* input tên loại phòng*/}
-                            <TextInput
-                                style={styles.inputStyle}
-                                value={tenPhong}
-                                mode="outlined"
-                                placeholder="Tên phòng"
-                                onChangeText={(text) => setTenPhong(text)}
-                            />
-                            {/* input tiền theo giờ phòng*/}
-                            <TextInput
-                                style={styles.inputStyle}
-                                value={tienThueTheoGio}
-                                mode="outlined"
-                                placeholder="Tiền thuê theo giờ"
-                                onChangeText={(text) => setTienThueTheoGio(text)}
-                            />
-                            {/* input tiền theo ngày*/}
-                            <TextInput
-                                style={styles.inputStyle}
-                                value={tienThueTheoNgay}
-                                mode="outlined"
-                                placeholder="Tiền thuê theo ngày"
-                                onChangeText={(text) => setTienThueTheoNgay(text)}
-                            />
-
-
-                            {/* view button  */}
-                            <View
-                                style={{
-
-                                    flexDirection: "row",
-                                    width: "100%",
-                                    justifyContent: "space-evenly",
-                                }}
-                            >
-                                <TouchableOpacity
-                                    title={btnLeft}
-                                    visible="false"
-                                    onPress={() => {
-                                        // _id, selectedLoai, tenSach, giaThue
-                                        if (_id && tenPhong && tinhTrang && maLoaiPhong && tienThueTheoGio && tienThueTheoNgay) {
-                                            // nếu _id , name , namSinh == true trùng với dữ liệu th
-                                            updatePhong();
-                                        } else {
-                                            insertPhong();
-                                        }
-                                    }}
-                                    style={[styles.button, styles.buttonClose]}
-                                    color="#009ACD"
+                    <View
+                        style={{
+                            flex: 1,
+                            backgroundColor: "rgba(52, 52, 52, 0.8)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <TouchableWithoutFeedback
+                            onPressOut={() => setModalVisible(false)}
+                            style={{ backgroundColor: "#fff", width: "100%" }}
+                        >
+                            <View style={styles.centeredView}>
+                                <TouchableWithoutFeedback
+                                    style={{ backgroundColor: "#fff", width: "100%" }}
                                 >
-                                    <Text style={{ fontWeight: 'bold', fontSize: 15, color: '#fff' }}>{btnLeft}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    title={btnRight}
-                                    onPress={() => {
-                                        setTenPhong("");
-                                        setTienThueTheoGio("");
-                                        setTienThueTheoNgay("");
+                                    <View style={styles.modalView}>
+                                        <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                                            {title}
+                                        </Text>
+                                        {/*dropdown chọn mã loại phòng */}
+                                        <Picker
+                                            mode="dropdown"
+                                            selectedValue={selectLoaiPhong}
+                                            onValueChange={(itemValue) => setSelectLoaiPhong(itemValue)}
+                                            style={styles.dropdown}
+                                        >
+                                            {maLoaiPhong.map(category => (
+                                                <Picker.Item
+                                                    key={category._id}
+                                                    label={category.tenLoaiPhong}
+                                                    value={category._id}
+                                                />
+                                            ))}
+                                        </Picker>
+                                        {/* input tên loại phòng*/}
+                                        <TextInput
+                                            style={styles.inputStyle}
+                                            value={tenPhong}
+                                            mode="outlined"
+                                            placeholder="Tên phòng"
+                                            onChangeText={(text) => setTenPhong(text)}
+                                        />
+                                        
+                                        {/* input tiền theo giờ phòng*/}
+                                        <TextInput
+                                            style={styles.inputStyle}
+                                            value={tienThueTheoGio}
+                                            mode="outlined"
+                                            placeholder="Tiền thuê theo giờ"
+                                            onChangeText={(text) => setTienThueTheoGio(text)}
+                                        />
+                                        {/* input tiền theo ngày*/}
+                                        <TextInput
+                                            style={styles.inputStyle}
+                                            value={tienThueTheoNgay}
+                                            mode="outlined"
+                                            placeholder="Tiền thuê theo ngày"
+                                            onChangeText={(text) => setTienThueTheoNgay(text)}
+                                        />
 
-                                        if (_id) {
-                                            Alert.alert(
-                                                //title
-                                                "Thông Báo!",
-                                                //body
-                                                "Bạn có chắc chắn muốn xóa không?",
-                                                [
-                                                    {
-                                                        text: "Có",
-                                                        onPress: () => {
-                                                            // handleRemove(item._id)
-                                                            deletePhong(_id);
-                                                        },
-                                                    },
-                                                    {
-                                                        text: "Không",
-                                                        onPress: () => {
-                                                            setModalVisible(!modalVisible);
-                                                            setId(0);
-                                                            setTenPhong("");
-                                                            setTienThueTheoGio("");
-                                                            setTienThueTheoNgay("");
 
-                                                            setBtnLeft("");
-                                                            setBtnRight("");
-                                                        },
-                                                        style: "cancel",
-                                                    },
-                                                ],
-                                                { cancelable: false }
-                                            );
-                                            setModalVisible(false);
-                                        } else {
-                                            setModalVisible(!modalVisible);
-                                            setId(0);
-                                            setTenPhong("");
-                                            setTienThueTheoGio("");
-                                            setTienThueTheoNgay("");
-                                            setBtnLeft("");
-                                            setBtnRight("");
-                                        }
-                                    }}
-                                    color="#009ACD"
-                                    style={[styles.button, styles.buttonClose]}
-                                >
-                                    <Text style={{ fontWeight: 'bold', fontSize: 15, color: '#fff' }}>{btnRight}</Text>
-                                </TouchableOpacity>
+                                        {/* view button  */}
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => {
+                                                if (_id && tenPhong && tinhTrang && maLoaiPhong && tienThueTheoGio && tienThueTheoNgay) {
+                                                    // nếu _id , name , namSinh == true trùng với dữ liệu th
+                                                    updatePhong();
+                                                } else {
+                                                    insertPhong();
+                                                }
+                                            }}
+                                        >
+                                            <Text style={{ color: "#fff", fontWeight:'bold' }}>Lưu</Text>
+                                        </TouchableOpacity>
+                                        {/* <View
+                                            style={{
 
+                                                flexDirection: "row",
+                                                width: "100%",
+                                                justifyContent: "space-evenly",
+                                            }}
+                                        >
+                                            <TouchableOpacity
+                                                title={btnLeft}
+                                                visible="false"
+                                                onPress={() => {
+                                                    // _id, selectedLoai, tenSach, giaThue
+                                                    if (_id && tenPhong && tinhTrang && maLoaiPhong && tienThueTheoGio && tienThueTheoNgay) {
+                                                        // nếu _id , name , namSinh == true trùng với dữ liệu th
+                                                        updatePhong();
+                                                    } else {
+                                                        insertPhong();
+                                                    }
+                                                }}
+                                                style={[styles.button, styles.buttonClose]}
+                                                color="#009ACD"
+                                            >
+                                                <Text style={{ fontWeight: 'bold', fontSize: 15, color: '#fff' }}>{btnLeft}</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                title={btnRight}
+                                                onPress={() => {
+                                                    setTenPhong("");
+                                                    setTienThueTheoGio("");
+                                                    setTienThueTheoNgay("");
+
+                                                    if (_id) {
+                                                        Alert.alert(
+                                                            //title
+                                                            "Thông Báo!",
+                                                            //body
+                                                            "Bạn có chắc chắn muốn xóa không?",
+                                                            [
+                                                                {
+                                                                    text: "Có",
+                                                                    onPress: () => {
+                                                                        // handleRemove(item._id)
+                                                                        deletePhong(_id);
+                                                                    },
+                                                                },
+                                                                {
+                                                                    text: "Không",
+                                                                    onPress: () => {
+                                                                        setModalVisible(!modalVisible);
+                                                                        setId(0);
+                                                                        setTenPhong("");
+                                                                        setTienThueTheoGio("");
+                                                                        setTienThueTheoNgay("");
+
+                                                                        setBtnLeft("");
+                                                                        setBtnRight("");
+                                                                    },
+                                                                    style: "cancel",
+                                                                },
+                                                            ],
+                                                            { cancelable: false }
+                                                        );
+                                                        setModalVisible(false);
+                                                    } else {
+                                                        setModalVisible(!modalVisible);
+                                                        setId(0);
+                                                        setTenPhong("");
+                                                        setTienThueTheoGio("");
+                                                        setTienThueTheoNgay("");
+                                                        setBtnLeft("");
+                                                        setBtnRight("");
+                                                    }
+                                                }}
+                                                color="#009ACD"
+                                                style={[styles.button, styles.buttonClose]}
+                                            >
+                                                <Text style={{ fontWeight: 'bold', fontSize: 15, color: '#fff' }}>{btnRight}</Text>
+                                            </TouchableOpacity>
+
+                                        </View> */}
+                                    </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                        </View>
+                        </TouchableWithoutFeedback>
                     </View>
                 </Modal>
 
-                {/* btn open dialog  */}
-                <View style={{ width: "100%", alignItems: "flex-end" }}>
+                {/* dialog chọn chức năng  */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showDialogChucNang}
+                    onRequestClose={() => {
+                        this.setShowDiaLogChucNang(false);
+                        setId(0)
+                        setTenPhong("");
+                        setTienThueTheoGio("");
+                        setTienThueTheoNgay("");
+                        setTinhTrang("");
+                        setSelectLoaiPhong(null);
+                    }}
+                    onBackdropPress={false}
+                    style={styles.cardView}
+                >
+                    <View
+                        style={{
+                            flex: 1,
+                            backgroundColor: "rgba(52, 52, 52, 0.8)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <TouchableWithoutFeedback
+                            onPressOut={() => {
+                                setShowDiaLogChucNang(false);
+                                setId(0)
+                                setTenPhong("");
+                                setTienThueTheoGio("");
+                                setTienThueTheoNgay("");
+                                setTinhTrang("");
+                                setSelectLoaiPhong(null);
+                            }}
+                            style={{ backgroundColor: "#fff" }}
+                        >
+                            <View style={styles.centeredView}>
+                                <TouchableWithoutFeedback
+                                    style={{ backgroundColor: "#fff", width: "100%" }}
+                                >
+                                    <View style={styles.modalView}>
+                                        <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                                            Dialog Chọn Chức Năng
+                                        </Text>
+
+                                        {/* btn xóa phong  */}
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => {
+                                                setShowDiaLogChucNang(!showDialogChucNang);
+                                                Alert.alert(
+                                                    //title
+                                                    "Thông Báo!",
+                                                    //body
+                                                    "Bạn có chắc chắn muốn xóa không?",
+                                                    [
+                                                        {
+                                                            text: "Có",
+                                                            onPress: () => {
+                                                                deletePhong(_id)
+                                                                edit(_id, tenPhong, maLoaiPhong, tienThueTheoGio, tienThueTheoNgay); 
+                                                                // handleRemove(_id);
+                                                            },
+                                                            
+                                                        },
+                                                        {
+                                                            text: "Không",
+                                                            onPress: () => {
+                                                                setId(0)
+                                                                setTenPhong("");
+                                                                setTienThueTheoGio("");
+                                                                setTienThueTheoNgay("");
+                                                                setTinhTrang("");
+                                                                setSelectLoaiPhong(null);
+                                                                setModalVisible(false);
+                                                            },
+                                                            style: "cancel",
+                                                        },
+                                                    ],
+                                                    { cancelable: false }
+                                                );
+                                            }}
+                                        >
+                                            <Text style={{ color: "#fff" }}>Xóa</Text>
+                                        </TouchableOpacity>
+                                        {/* btn sửa khách hàng  */}
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => {
+                                                {
+
+                                                    setModalVisible(!modalVisible);
+                                                    setTitle("Sửa Thông Tin Phòng")
+                                                    setShowDiaLogChucNang(!showDialogChucNang);
+                                                    edit(_id, tenPhong, maLoaiPhong, tienThueTheoGio, tienThueTheoNgay);
+                                                }
+                                            }}
+                                        >
+                                            <Text style={{ color: "#fff" }}>Sửa</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </Modal>
+
+                {/* btn open dialog them phong */}
+                <View style={{ width: "100%", alignItems: "flex-end", alignSelf: "flex-end", }}>
                     <TouchableOpacity
                         style={{
                             borderColor: "white",
-                            margin: 10,
-                            borderRadius: 5,
                             elevation: 100,
                             backgroundColor: "#35C2C1",
-                            borderBottomLeftRadius: 30,
-                            borderBottomRightRadius: 30,
-                            borderTopRightRadius: 30,
-                            borderTopLeftRadius: 30,
+                            borderRadius: 50,
                             overflow: "hidden",
-                            padding: 10,
+                            alignItems: "center",
+                            padding: 7,
+                            margin: 10,
                         }}
                         onPress={() => {
-                            setModalVisible(true), setBtnLeft("Save"), setBtnRight("Cancel");
+                            setModalVisible(true);
+                            setTitle("Thêm Thông Tin Phòng")
+                            setId(0)
+                            setTenPhong("");
+                            setTienThueTheoGio("");
+                            setTienThueTheoNgay("");
+                            setTinhTrang("");
+                            setSelectLoaiPhong(null);
                         }}
                     >
                         <Ionicons name="add" size={30} color="#fff" />
@@ -564,19 +726,39 @@ const styles = StyleSheet.create({
         elevation: 10,
 
     },
+    cardView: {
+        backgroundColor: "#000",
+        margin: 20,
+        padding: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        elevation: 2,
+        borderRadius: 10,
+        flex: 1,
+    },
     // style dialog
     centeredView: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: 1,
+        width: "100%",
     },
     modalView: {
-        margin: 20,
-        backgroundColor: 'white',
+        backgroundColor: "white",
         borderRadius: 20,
-        padding: 30,
-        shadowColor: '#000',
-        elevation: 5,
+        padding: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 10,
+        width: "85%",
+        alignItems: "center",
     },
     button: {
         flex: 1,
@@ -586,13 +768,19 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginLeft: 5,
         marginRight: 5,
-        alignItems: 'center'
+        alignItems: 'center',
+        
     },
-    buttonOpen: {
-        backgroundColor: '#525EAA',
-    },
-    buttonClose: {
+
+    //button dialog
+    button: {
+        borderRadius: 5,
+        padding: 10,
+        elevation: 2,
+        width: "90%",
+        alignItems: "center",
         backgroundColor: "#35C2C1",
+        margin: 10,
     },
     textStyle: {
         color: 'white',
@@ -603,19 +791,36 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: 'center',
     },
+    //input style
     inputStyle: {
-        margin: 5,
-        borderWidth: 1,
-        padding: 5,
-        borderRadius: 10,
+        // margin: 5,
+        // borderWidth: 1,
+        // padding: 5,
+        // borderRadius: 10,
+        width: 280,
+        backgroundColor: "#F7F8F9",
+        borderRadius: 8,
+        shadowColor: "black",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        paddingLeft: 10,
+        paddingTop: 8,
+        paddingBottom: 8,
+        margin: 10,
     },
+
     //picker
     dropdown: {
         backgroundColor: '#E0EEE0',
         borderRadius: 20,
-        width: 290,
+        width: 280,
         padding: 10,
-        margin: 5
+        margin: 10
     },
     //set style trống phòng
     trongPhong: {
