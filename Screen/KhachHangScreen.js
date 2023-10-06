@@ -118,7 +118,6 @@ export default function KhachHangScreen() {
     setSdt("");
     setCccd("");
     setDiaChi("");
-    
     console.log(allInputValue);
   };
   //action update dữ liệu

@@ -12,13 +12,16 @@ require('./models/NhanVien')
 ///
 
 require('./models/KhachHang');
-
+require('./models/LoaiDichVu');
+require('./models/DichVu');
 const LoaiPhong = mongoose.model("loaiPhong")
 const Phong = mongoose.model("phong")
 const NhanVien = mongoose.model("nhanVien")
 
 //
 const KhachHang = mongoose.model("KhachHang");
+const LoaiDichVu = mongoose.model("LoaiDichVu")
+const DichVu = mongoose.model("DichVu");
 const port = 3000;
 // const hostname = '192.168.1.6'; //long
 const hostname = '192.168.126.1'; //hantnph28876
@@ -127,7 +130,7 @@ app.get('/getTheoLoaiPhong/:id', async (req, res) => {
 
 
 
-//khachs hangf
+//CRUD khách hàng
 
 app.get('/getKhachHang', (req,res) => {
   KhachHang.find({}).then(data => {
@@ -183,6 +186,95 @@ app.delete('/deleteKhachHang/:id', async (req,res) => {
   }
 })
 
+
+//CRUD loại dịch vụ
+app.post('/insertLoaiDichVu', (req,res) => {
+  const loaiDichVu = new LoaiDichVu({
+    tenLoaiDichVu: req.body.tenLoaiDichVu,
+  })
+  loaiDichVu.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.get('/getLoaiDichVu', (req,res) => {
+  LoaiDichVu.find({}).then(data => {
+    console.log(data)
+    res.send(data)
+  })
+})
+
+//CRUD dịch vụ
+
+app.post('/insertDichVu' , (req,res) => {
+  const dichVu = new DichVu({
+    tenDichVu: req.body.tenDichVu,
+    giaDichVu: req.body.giaDichVu,
+    hinhAnh: req.body.hinhAnh,
+    maLoaiDichVu: req.body.maLoaiDichVu
+  })
+  dichVu.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+
+}) 
+
+//xem ở cmd nó ra dữ liệu 
+app.get('/getDichVu', (req,res) => {
+  DichVu.find({}).populate('maLoaiDichVu').then(data => {
+    console.log(data)
+    res.send(data)
+    //giờ mới lấy tên đc
+  })
+})
+
+app.put("/updateDichVu/:id", async (req, res ) => {
+  try{
+    const data = await DichVu.findByIdAndUpdate(req.params.id , req.body , {new : true})
+    if(!data){
+      return res.status(404).json({
+        message:"update failed"
+      })
+    }
+    return res.status(200).json({
+        message:"update successfully"
+        
+      })
+  }catch(error){
+    return res.status(500).json({
+      message: error.message,
+    })
+  }
+})
+
+app.delete('/deleteDichVu/:id', async (req,res) => {
+  try{
+    const data =  await DichVu.findByIdAndDelete(req.params.id)
+    if(!data){
+      return res.status(404).json({message: "delete failed"})
+    }else{
+      return res.status(200).json({message: "delete successful"})
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+
+  }
+})
+
+
+app.get('/getTheoLoaiDV/:id', async (req, res) => {
+  try {
+    const serviceTypeId = req.params.id;
+    const service = await DichVu.find({ maLoaiDichVu: serviceTypeId }).populate('maLoaiDichVu', '_id').populate('maLoaiDichVu');
+    res.json(service);
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
+  }
+});
 
 
 //server nhân viên
