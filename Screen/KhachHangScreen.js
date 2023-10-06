@@ -116,8 +116,7 @@ export default function KhachHangScreen() {
     setSdt("");
     setCccd("");
     setDiaChi("");
-    setBtnLeft("");
-    setBtnRight("");
+
     console.log(allInputValue);
   };
   //action update dữ liệu
@@ -166,8 +165,7 @@ export default function KhachHangScreen() {
     setSdt("");
     setCccd("");
     setDiaChi("");
-    setBtnLeft("");
-    setBtnRight("");
+    
     console.log(allInputValue);
   };
 
