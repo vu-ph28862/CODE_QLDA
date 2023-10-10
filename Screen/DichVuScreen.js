@@ -31,7 +31,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 
 export default function DichVu() {
-  const hostname = "192.168.1.3";
+  const hostname = "192.168.1.6";
   // value compoent
   const [_id, setId] = useState();
   const [tenDichVu, setTenDichVu] = useState("");
@@ -59,6 +59,8 @@ export default function DichVu() {
   const [oldListDV, setOldListDV] = useState([]);
   //const set value title dialog
   const [title, setTitle] = useState("");
+
+  const [cart, setCart] = useState([]);
   const getListLoaiDichVu = () => {
     fetch(`http://${hostname}:3000/getLoaiDichVu`, {
       method: "GET",
@@ -863,8 +865,8 @@ const styles = StyleSheet.create({
   //danh mục menu loại dịch vụ
   selectItemContainer: {
     width:110,
-    borderRadius: 10,
-    padding: 15,
+    borderRadius: 16,
+    padding: 10,
     marginRight:10,
     alignItems:"center"
   },

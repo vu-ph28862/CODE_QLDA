@@ -14,6 +14,8 @@ require('./models/NhanVien')
 require('./models/KhachHang');
 require('./models/LoaiDichVu');
 require('./models/DichVu');
+require('./models/DatPhong');
+require('./models/ChiTietDichVu');
 const LoaiPhong = mongoose.model("loaiPhong")
 const Phong = mongoose.model("phong")
 const NhanVien = mongoose.model("nhanVien")
@@ -22,9 +24,11 @@ const NhanVien = mongoose.model("nhanVien")
 const KhachHang = mongoose.model("KhachHang");
 const LoaiDichVu = mongoose.model("LoaiDichVu")
 const DichVu = mongoose.model("DichVu");
+const DatPhong = mongoose.model("DatPhong")
+const ChiTietDichVu = mongoose.model("ChiTietDichVu")
 const port = 3000;
-// const hostname = '192.168.1.6'; //long
-const hostname = '192.168.126.1'; //hantnph28876
+const hostname = '192.168.1.6'; //long
+// const hostname = '192.168.126.1'; //hantnph28876
 app.use(bodyParser.json())
 
 const mongoURL= 'mongodb+srv://hantnph28876:1234@cluster0.fwxkt48.mongodb.net/QuanLyDuAnAgile'
@@ -36,6 +40,7 @@ mongoose.connect(mongoURL , {
 mongoose.connection.on("conntected", () => {
   console.log("Connect success")
 })
+
 mongoose.connection.on("err" , (err) => {
   console.log("error" , err)
 })
@@ -330,6 +335,61 @@ app.put('/updateNhanVien/:id', async (req,res) => {
   }
 })
 
+//CRUD đặt phòng
+app.post('/insertDatPhong', (req,res) => {
+  const datPhong = new DatPhong({
+    thoiGianDen:req.body.thoiGianDen,
+    thoiGianTra:req.body.thoiGianTra,
+    thoiGianThue:req.body.thoiGianThue,
+    tinhTrang: req.body.tinhTrang,
+    tongTien: req.body.tongTien,
+    maKhachHang: req.body.maKhachHang,
+    maPhong: req.body.maPhong
+  })
+  datPhong.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.get('/getDatPhong', async (req,res) => {
+  try {
+     const datPhong = await DatPhong.find()
+     .populate('maKhachHang')
+     .populate('maPhong')
+    res.json(datPhong);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+
+//CRUD đặt dịch vụ
+app.post('/insertChiTietDichVu', (req,res) => {
+  const chiTietDichVu = new ChiTietDichVu({
+    soLuong:req.body.soLuong,
+    tongTien: req.body.tongTien,
+    maDichVu: req.body.maDichVu,
+    maDichVu: req.body.maDichVu,
+    maPhong: req.body.maPhong
+  })
+  chiTietDichVu.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.get('/getChiTietDichVu', async (req,res) => {
+  try {
+     const chiTietDichVu = await ChiTietDichVu.find()
+     .populate('maDichVu')
+     .populate('maPhong')
+    res.json(chiTietDichVu);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
 app.listen(port, hostname, () => {
         console.log(`Server running at http://${hostname}:${port}`)
