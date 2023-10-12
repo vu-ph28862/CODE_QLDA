@@ -119,6 +119,21 @@ app.put('/updatePhong/:id', async (req,res) => {
     return res.status(500).json({message: err.message})
   }
 })
+
+app.put('/updateTrangThaiPhong/:id', async (req,res) => {
+  try{
+    const data = await Phong.findByIdAndUpdate(req.params.id, req.body.tinhTrang)
+    if(!data){
+      return res.status(404).json({message: "update failed"})
+
+    }else{
+      return res.status(200).json({message: "update successful"})
+
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+  }
+})
 // API để lấy danh sách phòng theo loại phòng
 app.get('/getTheoLoaiPhong/:id', async (req, res) => {
   try {
