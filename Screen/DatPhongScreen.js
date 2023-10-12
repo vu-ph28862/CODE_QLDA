@@ -30,6 +30,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import DatePickerDialog from "./DatePickerDialog";
 import moment from "moment";
+import Product from './Product';
 
 export default function QuanLyDatPhong() {
   const hostname = "192.168.1.6"; //long
@@ -173,7 +174,11 @@ export default function QuanLyDatPhong() {
       })
       .then((res) => {
         if (res) {
-          setListPhong(res);
+          const filteredRooms = res.filter(item => item.tinhTrang === 'Yes');
+          console.log(res)
+          // Cập nhật state với danh sách phòng đã lọc
+          setListPhong(filteredRooms);
+          // setListPhong(res);
         }
       })
       .catch((err) => {
@@ -242,6 +247,8 @@ export default function QuanLyDatPhong() {
     getListDatPhong();
     setModalVisible(!modalVisible);
     Alert.alert("Thêm thành công");
+    //thêm thành công sẽ sửa trạng thái
+    updateTrangThaiPhong(selectPhong)
     setTinhTrang("");
     setSoNgayThue("");
     setSelectKhachHang(null);
@@ -279,6 +286,137 @@ export default function QuanLyDatPhong() {
     setSelectedStartDate("");
     setSelectedEndDate("");
   };
+  
+  
+  const [roomServices, setRoomServices] = useState({});
+  const [currentRoom, setCurrentRoom] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [itemQuantities, setItemQuantities] = useState({});
+  const handleItemClick = (item) => {
+  // Sao chép số lượng hiện tại từ state
+
+    const updatedItemQuantities = { ...itemQuantities };
+    
+    // Kiểm tra xem mục đã tồn tại trong state không
+    if (item._id in updatedItemQuantities) {
+      // Nếu đã tồn tại, tăng số lượng lên 1
+      updatedItemQuantities[item._id] += 1;
+    } else {
+      // Nếu chưa tồn tại, set số lượng bằng 1
+      updatedItemQuantities[item._id] = 1;
+    }
+
+    // Cập nhật state với số lượng mới
+    setItemQuantities(updatedItemQuantities);
+  };
+  const handleItemSelection = (item) => {
+  // Kiểm tra xem mục đã tồn tại trong danh sách đã chọn hay chưa
+  const isItemSelected = selectedItems.some((selectedItem) => selectedItem._id === item._id);
+
+  if (isItemSelected) {
+    // Nếu mục đã tồn tại, loại bỏ nó khỏi danh sách đã chọn
+    const updatedSelectedItems = selectedItems.filter((selectedItem) => selectedItem._id !== item._id);
+    setSelectedItems(updatedSelectedItems);
+    console.log("trùng")
+  } else {
+    // Nếu mục chưa tồn tại, thêm nó vào danh sách đã chọn
+    setSelectedItems([...selectedItems, item]);
+    console.log("khôong trùng")
+  }
+};
+
+  const handleTruSoLuong = (item) => {
+    const updatedItemQuantities = { ...itemQuantities };
+    if (item._id in updatedItemQuantities) {
+      // Nếu đã tồn tại, cộng hoặc trừ số lượng
+      updatedItemQuantities[item._id] -= 1;
+      if (updatedItemQuantities[item._id] < 0) {
+          updatedItemQuantities[item._id] = 0;
+      }
+    }
+    setItemQuantities(updatedItemQuantities);
+  }
+  const handleCongSoLuong = (item) => {
+    const updatedItemQuantities = { ...itemQuantities };
+    if (item._id in updatedItemQuantities) {
+      // Nếu đã tồn tại, cộng hoặc trừ số lượng
+      updatedItemQuantities[item._id] += 1;
+    }
+    setItemQuantities(updatedItemQuantities);
+  }
+  const changeRoom = (room) => {
+    setCurrentRoom(room);
+
+    // Lấy danh sách dịch vụ cho phòng từ state hoặc từ nguồn dữ liệu
+    const servicesForRoom = roomServices[room.id] ;
+    setListDatPhong(servicesForRoom);
+  };
+  const updateRoomServices = (room, services) => {
+    setListDatPhong((prevRoomServices) => ({
+      ...prevRoomServices,
+      [room._id]: services,
+    }));
+  };
+  
+  //   if (currentRoom) {
+  //     // Sao chép danh sách đã chọn cho phòng hiện tại từ state
+  //     const updatedSelectedItems = { ...selectedItemsByRoom };
+
+  //     // Kiểm tra xem danh sách đã chọn cho phòng hiện tại đã tồn tại chưa
+  //     if (!(currentRoom.id in updatedSelectedItems)) {
+  //       updatedSelectedItems[currentRoom.id] = [];
+  //     }
+
+  //     // Tìm vị trí của mục trong danh sách đã chọn cho phòng hiện tại (nếu có)
+  //     const itemIndex = updatedSelectedItems[currentRoom.id].findIndex(
+  //       (selectedItem) => selectedItem._id === item._id
+  //     );
+
+  //     // Nếu mục chưa được chọn cho phòng hiện tại, thêm vào danh sách đã chọn
+  //     if (itemIndex === -1) {
+  //       updatedSelectedItems[currentRoom.id].push(item);
+  //     } else {
+  //       // Nếu mục đã được chọn cho phòng hiện tại, loại bỏ khỏi danh sách đã chọn
+  //       updatedSelectedItems[currentRoom.id].splice(itemIndex, 1);
+  //     }
+
+  //     // Cập nhật state với danh sách đã chọn mới
+  //     setSelectedItemsByRoom(updatedSelectedItems);
+  //   }
+  // };
+  const calculateTotalPrice = () => {
+    let total = 0;
+
+    for (const item of listDichVu) {
+      if (item._id in itemQuantities) {
+        total += itemQuantities[item._id] * parseFloat(item.giaDichVu);
+      }
+    }
+
+    return total;
+  };
+
+  //update trạng thái phòng
+    const updateTrangThaiPhong = (selectPhong) => {
+        const phong = {
+            tinhTrang: "No",
+        }
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var requestOptions = {
+            method: 'PUT',
+            headers: myHeaders,
+            body: JSON.stringify(phong),
+        };
+
+        fetch(`http://${hostname}:3000/updateTrangThaiPhong/${selectPhong}`, requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result)
+                Alert.alert("Sửa thành công");
+            })
+            .catch(error => console.log('error', error));
+    }
   return (
     <View style={{ flex: 1, opacity: 1 }}>
       <StatusBar hidden={true} />
@@ -387,6 +525,7 @@ export default function QuanLyDatPhong() {
                     console.log("1")
                   }else{
                     setShowDiaLogChucNang(true);
+                    handleItemSelection(item)
                     console.log("2")
                   }
                 }}
@@ -630,8 +769,11 @@ export default function QuanLyDatPhong() {
                     >
                       <TouchableOpacity
                         style={[styles.button, { backgroundColor: "#08BE25" }]}
-                        onPress={() => {
-                          insertNhanPhong();
+                        onPress={() => {{
+                           insertNhanPhong();
+                          //  updateTrangThaiPhong(selectPhong)
+                        }
+                         
                         }}
                       >
                         <Text style={{ color: "#fff" }}>Nhận Phòng</Text>
@@ -640,7 +782,10 @@ export default function QuanLyDatPhong() {
                         style={[styles.button, { backgroundColor: "#FF9900" }]}
                         onPress={() => {
                           {
+                            {
                             insertDatPhong();
+                            updateTrangThaiPhong(selectPhong)
+                            }
                           }
                         }}
                       >
@@ -686,114 +831,63 @@ export default function QuanLyDatPhong() {
                     <Text style={{ fontSize: 18, fontWeight: "500" }}>
                       Thông Tin Nhận Phòng
                     </Text>
-                    
-                    {/* //picker phòng  */}
-                    <View style={styles.dropdown}>
-                      <Picker
-                          mode="dropdown"
-                          selectedValue={selectDichVu}
-                          onValueChange={(itemValue) =>
-                            setSelectDichVu(itemValue)
-                           
-                          }
-                        >
-                          {listDichVu.map((data) => (
-                            <Picker.Item
-                              key={data._id}
-                              label={data.tenDichVu}
-                              value={data._id}
-                              color="#8391A1"
-                              style={{ fontSize: 14, fontWeight: "600" }}
-                            />
-                          ))}
-                        </Picker>
-                    </View>
                     <ScrollView
                       showsVerticalScrollIndicator={false}
                       showsHorizontalScrollIndicator={false}
-                      horizontal
-                      style={{ padding: 5 , height:200 , margin:10 }}
+                      horizontal={false}
+                      style={{ padding: 5 , height:70 , margin:10 }}
                     >
-                     <FlatList
-                      style={{ width: "100%", alignSelf: "center" }}
-                      data={listDatPhong}
-                      keyExtractor={(item, index) => item._id}
-                      onRefresh={() => getListDatPhong()}
-                      refreshing={false}
+                      {listDichVu.map((item, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => 
+                        // handleItemSelection(item)
+                        handleItemClick(item)
+                      }
+                    >
+                      <View style={{width:"100%" , height:50 , flexDirection:"row" , justifyContent:"space-evenly"}}>
+                        <Image
+                          style={{width:30,height:30}}
+                          src={item.hinhAnh}
+                        />
+                        <Text>{item.tenDichVu}</Text>
+                        <Text>{item.giaDichVu}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                  </ScrollView>
+                  
+                    
+                    <Text>Các mục đã chọn:</Text>
+                    <FlatList
+                    style={{width:"100%",height:120 , backgroundColor:"#F7F8F9" , }}
+                      data={listDichVu.filter((item) => item._id in itemQuantities)}
+                      keyExtractor={(item) => item._id}
                       renderItem={({ item }) => (
-                        <View
-                          style={{
-                            borderWidth: 0.5,
-                            borderRadius: 10,
-                            margin: 10,
-                            padding: 5,
-                            flexDirection: "row",
-                            borderColor: "white",
-                            backgroundColor: "#FAFAFA",
-                            shadowColor: "#000",
-                            shadowOffset: {
-                              width: 0,
-                              height: 2,
-                            },
-                            shadowOpacity: 1,
-                            shadowRadius: 4,
-                            elevation: 7,
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "column",
-                              margin: 5,
-                              justifyContent: "space-between",
-                              alignItems: "flex-start",
-                              flex: 1,
-                            }}
-                          >
-                            <Text style={styles.textStyle}>
-                              Tên Phòng: {item.maPhong.tenPhong}
-                            </Text>
-                            <Text style={styles.textStyle}>Khách Hàng: {item.maKhachHang.tenKhachHang}</Text>
-                              <Text style={styles.textStyle}>
-                              Thời gian: {item.thoiGianThue} ngày
-                            </Text>
-                            
-                            <View style={{flexDirection:"row"}}>
-                              <Text style={styles.textStyle }>
-                              Trạng Thái:
-                              </Text>
-                              <Text style={[styles.textStyle , { color: item.tinhTrang === 'Đặt trước' ? '#FF0000' : '#388EBB'}]}>
-                              {"\t"}{ item.tinhTrang}
-                              </Text>
-                            </View>
-                            
+                        <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+                          <View>
+                            <Text>Tên dịch vụ: {item.tenDichVu}</Text>
+                            <Text>Giá dịch vụ: {item.giaDichVu}</Text>
                           </View>
-                          {/* dialog delete */}
-
+                          <View style={{flexDirection:"row" , alignItems:"center"}}>
                           <TouchableOpacity
-                            onPress={() => {
-                              // setShowDiaLogChucNang(true);
-                              // info(
-                              //   item._id,
-                              //   item.tenKhachHang,
-                              //   item.sdt,
-                              //   item.cccd,
-                              //   item.diaChi
-                              // );
-                              if(item.tinhTrang === 'Đặt trước'){
-                                console.log("1")
-                              }else{
-                                setShowDiaLogChucNang(true);
-                                console.log("2")
-                              }
-                            }}
-                          >
-                            <Ionicons name="reorder-two" size={24} color="black" />
+                           style={{margin:10 }}
+                           onPress={() => handleTruSoLuong(item)}>
+                            <Text style={{fontSize:18 , fontWeight:"bold"}}>-</Text>
                           </TouchableOpacity>
+
+                          <Text>{itemQuantities[item._id] || 0}</Text>
+                          
+                          <TouchableOpacity
+                          style={{margin:10 }}
+                           onPress={() => handleCongSoLuong(item)}>
+                            <Text style={{fontSize:18 , fontWeight:"bold"}}>+</Text>
+                          </TouchableOpacity>
+                          </View>
                         </View>
+                        
                       )}
                     />
-                  </ScrollView>
-                    
                     <View
                       style={{
                         flexDirection: "row",
@@ -819,7 +913,8 @@ export default function QuanLyDatPhong() {
                         }}
                       >
                         {/* {selectedValue} */}
-                        {tongTienPhong}
+                        {/* {tongTienPhong} */}
+                        {calculateTotalPrice()}
                       </Text>
                     </View>
                     <View
