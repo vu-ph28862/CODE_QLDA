@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function LoaiDichVu() {
+export default function HoaDonScreen() {
   return (
     <View>
-      <Text>LoaiDichVu</Text>
+      <Text>HoaDon</Text>
     </View>
   )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  
+})
