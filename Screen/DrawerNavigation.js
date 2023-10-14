@@ -5,13 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { DrawerItemList,createDrawerNavigator } from '@react-navigation/drawer';
 const Drawer = createDrawerNavigator();
-import { Feather , MaterialIcons , FontAwesome , Fontisto ,MaterialCommunityIcons  ,Ionicons ,SimpleLineIcons    } from '@expo/vector-icons';
+import { Feather , MaterialIcons , FontAwesome , Fontisto ,MaterialCommunityIcons  ,Ionicons ,SimpleLineIcons,Foundation
+    } from '@expo/vector-icons';
 //import compoent
 import ManHinhLogin from './ManHinhLogin';
 import ManHinhChinh  from './ManHinhChinh';
 import QuanLyPhong from './QuanLyPhong';
 import QuanLyDatPhong from './DatPhongScreen';
-import LoaiDichVu from './LoaiDichVuScreen';
+import HoaDonScreen from './HoaDonScreen';
 import DichVu from './DichVuScreen';
 import KhachHangScreen from './KhachHangScreen';
 import NhanVienScreen from './NhanVienScreen';
@@ -117,26 +118,24 @@ export default function DrawerNavigation() {
           }}
          />
 
-         <Drawer.Screen name="Loại Dịch Vụ" component={LoaiDichVu}
-        options={{
-            drawerLabel: "Loại Dịch Vụ",
-            title: "Loại Dịch Vụ",
-            drawerIcon: () => (
-              <MaterialIcons name="room-service" size={24} color="black" />
-            )
-          }}
-         />
-
          <Drawer.Screen name="Dịch Vụ" component={DichVu}
         options={{
             drawerLabel: "Dịch Vụ",
             title: "Dịch Vụ",
             drawerIcon: () => (
-              <MaterialIcons name="food-bank" size={24} color="black" />
+              <MaterialIcons name="room-service" size={24} color="black" />
             )
           }}
          />
-
+        <Drawer.Screen name="Hóa Đơn" component={HoaDonScreen}
+        options={{
+            drawerLabel: "Hóa Đơn",
+            title: "Hóa Đơn",
+            drawerIcon: () => (
+              <Foundation name="clipboard-notes" size={25} color="black" style={{margin:3}} />
+            )
+          }}
+         />
           <Drawer.Screen name="Khách Hàng" component={KhachHangScreen}
         options={{
             drawerLabel: "Khách Hàng",
