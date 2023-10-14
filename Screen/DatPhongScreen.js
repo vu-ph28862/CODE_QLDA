@@ -30,9 +30,8 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import DatePickerDialog from "./DatePickerDialog";
 import moment from "moment";
-import Product from './Product';
 
-export default function QuanLyDatPhong() {
+export default function QuanLyDatPhong({route}) {
   const hostname = "192.168.1.6"; //long
   // const hostname = '192.168.126.1'; //hantnph28876
 
@@ -47,16 +46,26 @@ export default function QuanLyDatPhong() {
   const [listPhong, setListPhong] = useState([]);
   const [listDatPhong, setListDatPhong] = useState([]);
   const [listDichVu, setListDichVu] = useState([]);
+  const [listPhieuDichVu , setListPhieuDichVu] = useState([]);
+  const [listNhanVien , setListNhanVien ] = useState([]);
   //mã loại dịch vụ
   const [selectDichVu, setSelectDichVu] = useState();
   const [selectKhachHang, setSelectKhachHang] = useState();
   const [selectPhong , setSelectPhong] = useState();
+  const [selectNhanVien , setSelectNhanVien ] = useState();
   //value list
   
   //checked dialog
   const [modalVisible, setModalVisible] = useState(false);
-  //check dialog chức năng
-  const [showDialogChucNang, setShowDiaLogChucNang] = useState(false);
+  //check dialog thêm - sửa dịch vụ nhận phòng
+  const [showDialogChiTietNhanPhong, setShowDiaLogChiTietNhanPhong] = useState(false);
+  //check dialog nhận phòng: gồm btn chi tiết - btn thanh toán
+  const [showDialogNhanPhong, setShowDiaLogNhanPhong] = useState(false);
+  //check dialog đặt trước: gồm btn hủy - btn nhận phòng
+  const [showDialogDatTruoc, setShowDiaLogDatTruoc] = useState(false);
+  //check dialog trả phòng
+  const [showDialogTraPhong , setShowDialogTraPhong] = useState(false);
+  //check dialog nhận phòng
   //searchview
   const [search, setSearch] = useState("");
   //const set value title dialog
@@ -77,7 +86,7 @@ export default function QuanLyDatPhong() {
       }else{
         const startDate = moment(start, 'DD-MM-YYYY');
         const endDate = moment(end, 'DD-MM-YYYY');
-        console.log(startDate);
+        console.log("ngay: "+startDate);
         const soNgay = endDate - startDate;
         // Chuyển đổi thành số ngày
         setSoNgayThue(soNgay / (1000 * 24 * 60 * 60)); 
@@ -217,14 +226,33 @@ export default function QuanLyDatPhong() {
         console.log(err);
       });
   };
+  const getListNhanVien = () => {
+  fetch(`http://${hostname}:3000/getNhanVien`, {
+      method: "GET",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res) {
+          setListNhanVien(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   useEffect(() => {
     getListKhachHang();
     getListPhong();
     getListDatPhong();
     getListDichVu();
+    getListPhieuDichVu();
+    getListNhanVien();
   }, []);
 
-  //insert du lieu
+  
+  //insert du lieu đặt phòng
   const insertDatPhong = () => {
     const datPhong = {
       thoiGianDen:selectedStartDate,
@@ -275,10 +303,12 @@ export default function QuanLyDatPhong() {
       },
       body: JSON.stringify(datPhong),
     });
-    console.log(datPhong);
+    console.log("value insert dat phong: "+datPhong);
     getListDatPhong();
     setModalVisible(!modalVisible);
     Alert.alert("Thêm thành công");
+    //thêm thành công sẽ sửa trạng thái
+    updateTrangThaiPhong(selectPhong)
     setSoNgayThue("");
     setTinhTrang("");
     setSelectKhachHang(null);
@@ -288,9 +318,7 @@ export default function QuanLyDatPhong() {
   };
   
   
-  const [roomServices, setRoomServices] = useState({});
-  const [currentRoom, setCurrentRoom] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]);
+  
   const [itemQuantities, setItemQuantities] = useState({});
   const handleItemClick = (item) => {
   // Sao chép số lượng hiện tại từ state
@@ -309,21 +337,6 @@ export default function QuanLyDatPhong() {
     // Cập nhật state với số lượng mới
     setItemQuantities(updatedItemQuantities);
   };
-  const handleItemSelection = (item) => {
-  // Kiểm tra xem mục đã tồn tại trong danh sách đã chọn hay chưa
-  const isItemSelected = selectedItems.some((selectedItem) => selectedItem._id === item._id);
-
-  if (isItemSelected) {
-    // Nếu mục đã tồn tại, loại bỏ nó khỏi danh sách đã chọn
-    const updatedSelectedItems = selectedItems.filter((selectedItem) => selectedItem._id !== item._id);
-    setSelectedItems(updatedSelectedItems);
-    console.log("trùng")
-  } else {
-    // Nếu mục chưa tồn tại, thêm nó vào danh sách đã chọn
-    setSelectedItems([...selectedItems, item]);
-    console.log("khôong trùng")
-  }
-};
 
   const handleTruSoLuong = (item) => {
     const updatedItemQuantities = { ...itemQuantities };
@@ -344,21 +357,9 @@ export default function QuanLyDatPhong() {
     }
     setItemQuantities(updatedItemQuantities);
   }
-  const changeRoom = (room) => {
-    setCurrentRoom(room);
-
-    // Lấy danh sách dịch vụ cho phòng từ state hoặc từ nguồn dữ liệu
-    const servicesForRoom = roomServices[room.id] ;
-    setListDatPhong(servicesForRoom);
-  };
-  const updateRoomServices = (room, services) => {
-    setListDatPhong((prevRoomServices) => ({
-      ...prevRoomServices,
-      [room._id]: services,
-    }));
-  };
   
   //   if (currentRoom) {
+
   //     // Sao chép danh sách đã chọn cho phòng hiện tại từ state
   //     const updatedSelectedItems = { ...selectedItemsByRoom };
 
@@ -384,21 +385,21 @@ export default function QuanLyDatPhong() {
   //     setSelectedItemsByRoom(updatedSelectedItems);
   //   }
   // };
+
   const calculateTotalPrice = () => {
     let total = 0;
-
     for (const item of listDichVu) {
       if (item._id in itemQuantities) {
         total += itemQuantities[item._id] * parseFloat(item.giaDichVu);
       }
     }
-
     return total;
   };
 
   //update trạng thái phòng
-    const updateTrangThaiPhong = (selectPhong) => {
+  const updateTrangThaiPhong = (_id) => {
         const phong = {
+            _id:selectPhong,
             tinhTrang: "No",
         }
         var myHeaders = new Headers();
@@ -409,19 +410,189 @@ export default function QuanLyDatPhong() {
             body: JSON.stringify(phong),
         };
 
-        fetch(`http://${hostname}:3000/updateTrangThaiPhong/${selectPhong}`, requestOptions)
-            .then(response => response.json())
+        fetch(`http://${hostname}:3000/updateTrangThaiPhong/${_id}`, requestOptions)
+            .then(response => {
+              response.json()
+              })
             .then(result => {
-                console.log(result)
-                Alert.alert("Sửa thành công");
+                console.log("value update trang thai phong: "+result)
+                getListPhong();
             })
             .catch(error => console.log('error', error));
+  }
+
+  
+  const [maPhong,setMaPhong] = useState("");
+  // thêm list dịch vụ vào bảng chiTietDichVu
+
+  const infoPhong = (maPhong , id , tienDatPhong) => {
+    console.log("ma Phong: "+ maPhong + " \t ma dat phong: \t" + id + "\t tien dat phong: " + tienDatPhong);
+    setMaPhong(maPhong);
+    setValueIdDatPhong(id);
+    setTienDatPhong(tienDatPhong);
+  }
+  const insertPhieuDichVu = () => {
+      const phieuDichVu = {
+      maPhong:maPhong,
+      tongTien:calculateTotalPrice(),
+    };
+
+    fetch(`http://${hostname}:3000/insertPhieuDichVu`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(phieuDichVu),
+    });
+    console.log("value insert phieu dich vu: "+phieuDichVu);
+    setShowDiaLogChiTietNhanPhong(!showDialogChiTietNhanPhong)
+    Alert.alert("Thêm thành công");
+    
+    //thêm thành công sẽ sửa trạng thái
+    setItemQuantities({});
+    setItemQuantities([]);
+
+  }
+  const getListPhieuDichVu = () => {
+    fetch(`http://${hostname}:3000/getPhieuDichVu`, {
+      method: "GET",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res) {
+          setListPhieuDichVu(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const [tongTienDichVu , setTongTienDichVu] = useState(0);  
+  const [tienDatPhong , setTienDatPhong] = useState(0);
+  const [valueIdPhieuDichVu,setValueIdPhieuDichVu] = useState("");
+  const [valueIdDatPhong , setValueIdDatPhong] = useState();
+  
+  //lay id phong
+  onItemClick = (maPhong) => {
+    const phieuDatDichVuItem = listPhieuDichVu.find(
+      (item) => item.maPhong?._id === maPhong
+    );
+    if (phieuDatDichVuItem) {
+      console.log("Id Phieu Dich Vu "+ phieuDatDichVuItem._id);
+      setValueIdPhieuDichVu(phieuDatDichVuItem);
+      setTongTienDichVu(phieuDatDichVuItem.tongTien);
     }
+  }
+  
+  //Hóa đơn
+  //lấy ngày hiện tại
+  const currentDate = new Date();
+  const formattedDate = moment(currentDate).format('DD-MM-YYYY');
+  const insertHoaDonThanhToan = () => {
+      const dichVu = parseInt(tongTienDichVu, 10);
+      const datPhong = parseInt(tienDatPhong, 10);
+      const hoaDon = {
+      ngayTao:formattedDate,
+      tongTienHoaDon:dichVu + datPhong,
+      trangThai:"Hoàn tất",
+      maNV:"admin",
+      maCTDV:valueIdPhieuDichVu,
+      maDatPhong:valueIdDatPhong,
+    };
+
+    fetch(`http://${hostname}:3000/insertHoaDonThanhToan`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(hoaDon),
+    });
+    console.log("value hoa don: "+hoaDon);
+    setShowDiaLogNhanPhong(!showDialogNhanPhong)
+    Alert.alert("Thanh toán thành công");
+    updateTraPhong(maPhong);
+    setTienDatPhong(0);
+    setTongTienDichVu(0);
+  }
+  
+  const insertHoaDonHuy = () => {
+      const hoaDon = {
+      ngayTao:formattedDate,
+      tongTienHoaDon:0,
+      trangThai:"Hủy Đặt Phòng",
+      maNV:"admin",
+      maDatPhong:valueIdDatPhong,
+    };
+
+    fetch(`http://${hostname}:3000/insertHoaDonThanhToan`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(hoaDon),
+    });
+    console.log("value hoa don huy :" + hoaDon);
+    setShowDiaLogDatTruoc(!showDialogDatTruoc)
+    Alert.alert("Hủy đặt phòng thành công");
+    updateTraPhong(maPhong);
+  }
+  const updateTraPhong = (maPhong) => {
+        const phong = {
+          
+            tinhTrang: "Yes",
+        }
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var requestOptions = {
+            method: 'PUT',
+            headers: myHeaders,
+            body: JSON.stringify(phong),
+        };
+
+        fetch(`http://${hostname}:3000/updateTrangThaiPhong/${maPhong}`, requestOptions)
+            .then(response => {
+                response.json()
+              })
+            .then(result => {
+                console.log("value update trang thai phong: "+result)
+                getListPhong();
+                setMaPhong(0);
+            })
+            .catch(error => console.log('error', error));
+  }
+
+  //update trạng thái nhận phòng
+  const updateTrangThaiDatPhong = (valueIdDatPhong) => {
+    const datPhong = {
+      tinhTrang:"Đang thuê"
+    }
+    var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var requestOptions = {
+            method: 'PUT',
+            headers: myHeaders,
+            body: JSON.stringify(datPhong),
+        };
+
+        fetch(`http://${hostname}:3000/updateTrangThaiDatPhong/${valueIdDatPhong}`, requestOptions)
+            .then(response => {
+                response.json()
+              })
+            .then(result => {
+                console.log("value update trang thai dat phong: "+result)
+                getListDatPhong();
+                setValueIdDatPhong(0);
+            })
+            .catch(error => console.log('error', error));
+  }
   return (
     <View style={{ flex: 1, opacity: 1 }}>
       <StatusBar hidden={true} />
       <ImageBackground
         style={styles.container}
+        
         source={require("../assets/background.png")}
       >
         <View style={styles.sectionStyle}>
@@ -509,24 +680,20 @@ export default function QuanLyDatPhong() {
                 </View>
                 
               </View>
-              {/* dialog delete */}
+              {/* dialog item chi tiết */}
 
               <TouchableOpacity
                 onPress={() => {
-                  // setShowDiaLogChucNang(true);
-                  // info(
-                  //   item._id,
-                  //   item.tenKhachHang,
-                  //   item.sdt,
-                  //   item.cccd,
-                  //   item.diaChi
-                  // );
+                  
+                  infoPhong(item.maPhong._id , item._id , item.tongTien);
+                  onItemClick(item.maPhong?._id)
+                  console.log(item.maPhong?._id);
+                  //đặt trước
                   if(item.tinhTrang === 'Đặt trước'){
-                    console.log("1")
+                    setShowDiaLogDatTruoc(true)
                   }else{
-                    setShowDiaLogChucNang(true);
-                    handleItemSelection(item)
-                    console.log("2")
+                    //nhận phòng
+                    setShowDiaLogNhanPhong(true);
                   }
                 }}
               >
@@ -613,11 +780,6 @@ export default function QuanLyDatPhong() {
                             {
                               setModalVisible(true);
                               setTitle("Đặt Phòng");
-                              setId(0);
-                              setTenKhachHang("");
-                              setCccd("");
-                              setSdt("");
-                              setDiaChi("");
                             }
                           }}
                         >
@@ -768,23 +930,21 @@ export default function QuanLyDatPhong() {
                       }}
                     >
                       <TouchableOpacity
-                        style={[styles.button, { backgroundColor: "#08BE25" }]}
+                        style={[styles.buttonChiTiet, { backgroundColor: "#08BE25" }]}
                         onPress={() => {{
                            insertNhanPhong();
-                          //  updateTrangThaiPhong(selectPhong)
                         }
-                         
                         }}
                       >
                         <Text style={{ color: "#fff" }}>Nhận Phòng</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={[styles.button, { backgroundColor: "#FF9900" }]}
+                        style={[styles.buttonChiTiet, { backgroundColor: "#FF9900" }]}
                         onPress={() => {
                           {
                             {
-                            insertDatPhong();
-                            updateTrangThaiPhong(selectPhong)
+                                insertDatPhong();
+                            
                             }
                           }
                         }}
@@ -799,13 +959,13 @@ export default function QuanLyDatPhong() {
           </View>
         </Modal>
         
-        {/* dialog nhận phòng  */}
+        {/* dialog chi tiết thêm - sửa dịch vụ nhận phòng  */}
         <Modal
           animationType="slide"
           transparent={true}
-          visible={showDialogChucNang}
+          visible={showDialogChiTietNhanPhong}
           onRequestClose={() => {
-            this.showDialogChucNang(false);
+            this.setShowDiaLogChiTietNhanPhong(false);
           }}
           style={styles.cardView}
         >
@@ -819,7 +979,7 @@ export default function QuanLyDatPhong() {
           >
             <TouchableWithoutFeedback
               onPressOut={() => {
-                 setShowDiaLogChucNang(false);
+                 setShowDiaLogChiTietNhanPhong(false);
                 }}
               style={{ backgroundColor: "#fff", width: "100%" }}
             >
@@ -841,7 +1001,6 @@ export default function QuanLyDatPhong() {
                     <TouchableOpacity
                       key={index}
                       onPress={() => 
-                        // handleItemSelection(item)
                         handleItemClick(item)
                       }
                     >
@@ -927,7 +1086,7 @@ export default function QuanLyDatPhong() {
                       <TouchableOpacity
                         style={[styles.button, { backgroundColor: "#08BE25" }]}
                         onPress={() => {
-                          insertNhanPhong();
+                          insertPhieuDichVu();
                         }}
                       >
                         <Text style={{ color: "#fff" }}>Hoàn Tất</Text>
@@ -939,8 +1098,141 @@ export default function QuanLyDatPhong() {
             </TouchableWithoutFeedback>
           </View>
         </Modal>
+         {/* dialog chọn chức năng nhận phòng  */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showDialogNhanPhong}
+          onRequestClose={() => {
+            this.setShowDiaLogNhanPhong(false);
+          }}
+          onBackdropPress={false}
+          style={styles.cardView}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(52, 52, 52, 0.8)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableWithoutFeedback
+              onPressOut={() => {
+                setShowDiaLogNhanPhong(false);
+              }}
+              style={{ backgroundColor: "#fff" }}
+            >
+              <View style={styles.centeredView}>
+                <TouchableWithoutFeedback
+                  style={{ backgroundColor: "#fff", width: "100%" }}
+                >
+                  <View style={styles.modalView}>
+                    <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                      Dialog Chọn Chức Năng
+                    </Text>
 
+                    {/* btn xóa khách hàng  */}
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        setShowDiaLogChiTietNhanPhong(!showDialogChiTietNhanPhong);
+                        setShowDiaLogNhanPhong(false);
+                        
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>Chi Tiết</Text>
+                    </TouchableOpacity>
+                    {/* btn sửa khách hàng  */}
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        {
+                            insertHoaDonThanhToan();
+                        }
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>Trả Phòng</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </Modal>               
+        {/* dialog chọn chức năng đặt trước  */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showDialogDatTruoc}
+          onRequestClose={() => {
+            this.setShowDiaLogDatTruoc(false);
+            setId(0);
+            setTenKhachHang("");
+            setCccd("");
+            setSdt("");
+            setDiaChi("");
+          }}
+          onBackdropPress={false}
+          style={styles.cardView}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(52, 52, 52, 0.8)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableWithoutFeedback
+              onPressOut={() => {
+                setShowDiaLogDatTruoc(false);
+                setId(0);
+                setTenKhachHang("");
+                setCccd("");
+                setSdt("");
+                setDiaChi("");
+              }}
+              style={{ backgroundColor: "#fff" }}
+            >
+              <View style={styles.centeredView}>
+                <TouchableWithoutFeedback
+                  style={{ backgroundColor: "#fff", width: "100%" }}
+                >
+                  <View style={styles.modalView}>
+                    <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                      Dialog Chọn Chức Năng
+                    </Text>
 
+                    {/* btn xóa khách hàng  */}
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        setShowDiaLogDatTruoc(!showDialogDatTruoc);
+                        insertHoaDonHuy();
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>Hủy Đặt Phòng</Text>
+                    </TouchableOpacity>
+                    {/* btn sửa khách hàng  */}
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => {
+                        {
+                          setShowDiaLogDatTruoc(!showDialogDatTruoc);
+                          updateTrangThaiDatPhong();
+                        }
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>Nhận Phòng</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </Modal> 
+        
         {/* click btn add  */}
         <View
           style={{
@@ -1083,5 +1375,24 @@ const styles = StyleSheet.create({
     height: 40,
     margin: 5,
     justifyContent: "center",
+  },
+  //button dialog
+  button: {
+    borderRadius: 5,
+    padding: 10,
+    elevation: 2,
+    width: "90%",
+    alignItems: "center",
+    backgroundColor: "#35C2C1",
+    margin: 10,
+  },
+  buttonChiTiet: {
+    flex:1,
+    borderRadius: 5,
+    padding: 10,
+    elevation: 2,
+    alignItems: "center",
+    backgroundColor: "#35C2C1",
+    margin: 10,
   },
 });

@@ -16,6 +16,8 @@ require('./models/LoaiDichVu');
 require('./models/DichVu');
 require('./models/DatPhong');
 require('./models/ChiTietDichVu');
+require('./models/PhieuDatDichVu');
+require('./models/HoaDon')
 const LoaiPhong = mongoose.model("loaiPhong")
 const Phong = mongoose.model("phong")
 const NhanVien = mongoose.model("nhanVien")
@@ -26,6 +28,8 @@ const LoaiDichVu = mongoose.model("LoaiDichVu")
 const DichVu = mongoose.model("DichVu");
 const DatPhong = mongoose.model("DatPhong")
 const ChiTietDichVu = mongoose.model("ChiTietDichVu")
+const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
+const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
 const hostname = '192.168.1.6'; //long
 // const hostname = '192.168.126.1'; //hantnph28876
@@ -122,7 +126,7 @@ app.put('/updatePhong/:id', async (req,res) => {
 
 app.put('/updateTrangThaiPhong/:id', async (req,res) => {
   try{
-    const data = await Phong.findByIdAndUpdate(req.params.id, req.body.tinhTrang)
+    const data = await Phong.findByIdAndUpdate(req.params.id, req.body, {new: true})
     if(!data){
       return res.status(404).json({message: "update failed"})
 
@@ -248,7 +252,6 @@ app.get('/getDichVu', (req,res) => {
   DichVu.find({}).populate('maLoaiDichVu').then(data => {
     console.log(data)
     res.send(data)
-    //giờ mới lấy tên đc
   })
 })
 
@@ -379,6 +382,20 @@ app.get('/getDatPhong', async (req,res) => {
   }
 })
 
+app.put('/updateTrangThaiDatPhong/:id', async (req,res) => {
+  try{
+    const data = await DatPhong.findByIdAndUpdate(req.params.id, req.body.tinhTrang)
+    if(!data){
+      return res.status(404).json({message: "update failed"})
+
+    }else{
+      return res.status(200).json({message: "update successful"})
+
+    }
+  }catch(err){
+    return res.status(500).json({message: err.message})
+  }
+})
 //CRUD đặt dịch vụ
 app.post('/insertChiTietDichVu', (req,res) => {
   const chiTietDichVu = new ChiTietDichVu({
@@ -405,6 +422,72 @@ app.get('/getChiTietDichVu', async (req,res) => {
     res.status(500).json({ error: error.message });
   }
 })
+
+//CRUD phiếu đặt dịch vụ
+app.post('/insertPhieuDichVu', (req,res) => {
+  const phieuDichVu = new PhieuDatDichVu({
+    tongTien: req.body.tongTien,
+    maPhong: req.body.maPhong
+  })
+  phieuDichVu.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.get('/getPhieuDichVu', async (req,res) => {
+  try {
+     const phieuDichVu = await PhieuDatDichVu.find()
+     .populate('maPhong')
+    res.json(phieuDichVu);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+app.get('/getPhieuTheoMaPhong/:id', async (req, res) => {
+  try {
+    const roomId = req.params.id;
+    const rooms = await PhieuDatDichVu.find({ maPhong: roomId }).populate('maPhong', '_id').populate('maPhong');
+    res.json(rooms);
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy danh sách Phòng' });
+  }
+});
+
+
+//CRUD HoaDon
+app.post('/insertHoaDonThanhToan', (req,res) => {
+  const hoaDon = new HoaDon({
+    ngayTao: req.body.ngayTao,
+    tongTienHoaDon: req.body.tongTienHoaDon,
+    trangThai: req.body.trangThai,
+    maNV: req.body.maNV,
+    maCTDV: req.body.maCTDV,
+    maDatPhong: req.body.maDatPhong
+  })
+  hoaDon.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
+app.post('/insertHoaDonDatPhong', (req,res) => {
+  const hoaDon = new HoaDon({
+    ngayTao: req.body.ngayTao,
+    tongTienHoaDon: req.body.tongTienHoaDon,
+    trangThai: req.body.trangThai,
+    maNV: req.body.maNV,
+    maDatPhong: req.body.maDatPhong
+  })
+  hoaDon.save()
+  .then(data => {
+    console.log(data)
+    res.send(data)
+  }).catch(err => {console.log(err)})
+})
+
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
 app.listen(port, hostname, () => {
         console.log(`Server running at http://${hostname}:${port}`)
