@@ -31,7 +31,7 @@ const ChiTietDichVu = mongoose.model("ChiTietDichVu")
 const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
 const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
-const hostname = '192.168.1.6'; //long
+const hostname = '192.168.1.4'; //long
 // const hostname = '192.168.126.1'; //hantnph28876
 app.use(bodyParser.json())
 
@@ -384,7 +384,7 @@ app.get('/getDatPhong', async (req,res) => {
 
 app.put('/updateTrangThaiDatPhong/:id', async (req,res) => {
   try{
-    const data = await DatPhong.findByIdAndUpdate(req.params.id, req.body.tinhTrang)
+    const data = await DatPhong.findByIdAndUpdate(req.params.id, req.body,{new : true})
     if(!data){
       return res.status(404).json({message: "update failed"})
 
