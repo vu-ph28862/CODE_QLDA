@@ -30,9 +30,18 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import DatePickerDialog from "./DatePickerDialog";
 import moment from "moment";
+// import { 
+//   Icon , Feather,
+//   MaterialIcons,
+//   FontAwesome,
+//   Fontisto,
+//   MaterialCommunityIcons,
+//   Ionicons,
+//   SimpleLineIcons,
+//   EvilIcons, } from "react-native-vector-icons/icon";
 
 export default function QuanLyDatPhong({route}) {
-  const hostname = "192.168.1.6"; //long
+  const hostname = "192.168.1.4"; //long
   // const hostname = '192.168.126.1'; //hantnph28876
 
   // value compoent
@@ -430,6 +439,7 @@ export default function QuanLyDatPhong({route}) {
     setMaPhong(maPhong);
     setValueIdDatPhong(id);
     setTienDatPhong(tienDatPhong);
+    //
   }
   const insertPhieuDichVu = () => {
       const phieuDichVu = {
@@ -540,7 +550,6 @@ export default function QuanLyDatPhong({route}) {
   }
   const updateTraPhong = (maPhong) => {
         const phong = {
-          
             tinhTrang: "Yes",
         }
         var myHeaders = new Headers();
@@ -582,10 +591,22 @@ export default function QuanLyDatPhong({route}) {
               })
             .then(result => {
                 console.log("value update trang thai dat phong: "+result)
+                alert("thanh cong")
                 getListDatPhong();
                 setValueIdDatPhong(0);
             })
             .catch(error => console.log('error', error));
+  }
+
+  //xem chi tiết
+  const [chiTietMaPhong, setChiTietMaPhong] = useState("");
+  const [chiTietPhong , setChiTietPhong] = useState("");
+  const [chiTietTienPhong , setChiTietTienPhong] = useState("");
+  const [chiTietNgayThue , setChiTietNgayThue] = useState("");
+  const infoChiTietPhong = (chiTietPhong , chiTietNgayThue , chiTietTienPhong) => {
+    setChiTietPhong(chiTietPhong),
+    setChiTietTienPhong(chiTietTienPhong);
+    setChiTietNgayThue(chiTietNgayThue)
   }
   return (
     <View style={{ flex: 1, opacity: 1 }}>
@@ -667,9 +688,11 @@ export default function QuanLyDatPhong({route}) {
                 </Text>
                 <Text style={styles.textStyle}>Khách Hàng: {item.maKhachHang.tenKhachHang}</Text>
                   <Text style={styles.textStyle}>
-                  Thời gian: {item.thoiGianThue} ngày
-                </Text>
-                
+                  Thời gian nhận: {item.thoiGianDen}
+                  </Text>
+                  <Text style={styles.textStyle}>
+                  Thời gian trả: {item.thoiGianTra}
+                  </Text>
                 <View style={{flexDirection:"row"}}>
                   <Text style={styles.textStyle }>
                   Trạng Thái:
@@ -688,6 +711,7 @@ export default function QuanLyDatPhong({route}) {
                   infoPhong(item.maPhong._id , item._id , item.tongTien);
                   onItemClick(item.maPhong?._id)
                   console.log(item.maPhong?._id);
+                  infoChiTietPhong(item.maPhong.tenPhong , item.thoiGianThue , item.tongTien)
                   //đặt trước
                   if(item.tinhTrang === 'Đặt trước'){
                     setShowDiaLogDatTruoc(true)
@@ -809,7 +833,7 @@ export default function QuanLyDatPhong({route}) {
                       </Picker>
                     </View>
 
-                    <View
+                    {/* <View
                       style={{
                         flexDirection: "row",
                         margin: 10,
@@ -818,38 +842,9 @@ export default function QuanLyDatPhong({route}) {
                       }}
                     >
                       <View style={[styles.dropdown, { flex: 1 }]}>
-                        <Picker
-                          mode="dropdown"
-                          selectedValue={selectThoiGian}
-                          onValueChange={(itemValue) =>
-                            setSelectThoiGian(itemValue)
-                          }
-                        >
-                          <Picker.Item
-                            label="Ngày"
-                            value="java"
-                            color="#8391A1"
-                            style={{ fontSize: 14, fontWeight: "600" }}
-                          />
-                          <Picker.Item
-                            label="Giờ"
-                            value="js"
-                            color="#8391A1"
-                            style={{ fontSize: 14, fontWeight: "600" }}
-                          />
-                        </Picker>
                       </View>
-                      <Text
-                        style={{
-                          fontSize: 11,
-                          color: "#0075FF",
-                          fontWeight: "bold",
-                          marginLeft: 10,
-                        }}
-                      >
-                        {soNgayThue + " Ngày"}
-                      </Text>
-                    </View>
+                     
+                    </View> */}
                     {/* //thời gian nhận phòng  */}
                     <View style={styles.inputStyle}>
                       <TouchableOpacity
@@ -898,10 +893,24 @@ export default function QuanLyDatPhong({route}) {
                       style={{
                         flexDirection: "row",
                         alignSelf: "flex-end",
-                        alignItems: "center",
+                        justifyContent:"space-between",
+                        width:"95%"
                       }}
                     >
-                      <Text
+                      <View style={{alignSelf:"flex-start"}}>
+                        <Text
+                        style={{
+                          fontSize: 11,
+                          color: "#0075FF",
+                          fontWeight: "bold",
+                          textAlign:"left"
+                        }}
+                      >
+                        {soNgayThue + " Ngày"}
+                      </Text>
+                      </View>
+                      <View style={{alignSelf:"flex-end" , flexDirection:"row"}}>
+                        <Text
                         style={{
                           fontSize: 13,
                           marginRight: 5,
@@ -921,6 +930,8 @@ export default function QuanLyDatPhong({route}) {
                         {/* {selectedValue} */}
                         {tongTienPhong}
                       </Text>
+                      </View>
+                      
                     </View>
                     <View
                       style={{
@@ -944,7 +955,6 @@ export default function QuanLyDatPhong({route}) {
                           {
                             {
                                 insertDatPhong();
-                            
                             }
                           }
                         }}
@@ -980,6 +990,9 @@ export default function QuanLyDatPhong({route}) {
             <TouchableWithoutFeedback
               onPressOut={() => {
                  setShowDiaLogChiTietNhanPhong(false);
+                 setItemQuantities({})
+                 setItemQuantities([])
+
                 }}
               style={{ backgroundColor: "#fff", width: "100%" }}
             >
@@ -988,14 +1001,47 @@ export default function QuanLyDatPhong({route}) {
                   style={{ backgroundColor: "#fff", width: "100%" }}
                 >
                   <View style={styles.modalView}>
-                    <Text style={{ fontSize: 18, fontWeight: "500" }}>
-                      Thông Tin Nhận Phòng
+                    <Text style={{ fontSize: 18, fontWeight: "500" , marginBottom:10 }}>
+                      Chi tiết Nhận Phòng
+                    </Text>
+
+                    {/* thông tin chi tiết đặt phòng  */}
+
+                    <View style={{flexDirection:"row" , width:"100%" , justifyContent:"space-around"}}>
+                      <View style={{flexDirection:"row"}}>
+                        <MaterialIcons
+                        name="meeting-room"
+                        size={20}
+                        color="black"
+                      />
+                      <Text> Phòng: {chiTietPhong}</Text>  
+                      </View>
+                       <View style={{flexDirection:"row"}}>
+                      <Ionicons
+                        name="time-outline"
+                        size={20}
+                        color="black"
+                      />
+                      <Text>Thời gian thuê: {chiTietNgayThue} ngày</Text>
+                       </View>
+                      
+                    </View>
+                    <View style={{flexDirection:"row"}}>
+                        <FontAwesome
+                        name="money"
+                        size={20}
+                        color="black"
+                      />
+                      <Text> Tiền Đặt Phòng {chiTietTienPhong} đ</Text>
+                    </View>
+                    <Text style={{ fontSize: 15, fontWeight: "500" , margin:10 }}>
+                      Dịch vụ Phòng 
                     </Text>
                     <ScrollView
                       showsVerticalScrollIndicator={false}
                       showsHorizontalScrollIndicator={false}
                       horizontal={false}
-                      style={{ padding: 5 , height:70 , margin:10 }}
+                      style={{ padding: 5 , height:70 , marginTop:10 }}
                     >
                       {listDichVu.map((item, index) => (
                     <TouchableOpacity
@@ -1017,7 +1063,9 @@ export default function QuanLyDatPhong({route}) {
                   </ScrollView>
                   
                     
-                    <Text>Các mục đã chọn:</Text>
+                    <Text style={{ fontSize: 13, fontWeight: "500" }}>
+                      Danh sách dịch vụ
+                    </Text>
                     <FlatList
                     style={{width:"100%",height:120 , backgroundColor:"#F7F8F9" , }}
                       data={listDichVu.filter((item) => item._id in itemQuantities)}
@@ -1071,8 +1119,6 @@ export default function QuanLyDatPhong({route}) {
                           fontWeight: "500",
                         }}
                       >
-                        {/* {selectedValue} */}
-                        {/* {tongTienPhong} */}
                         {calculateTotalPrice()}
                       </Text>
                     </View>
@@ -1220,7 +1266,8 @@ export default function QuanLyDatPhong({route}) {
                       onPress={() => {
                         {
                           setShowDiaLogDatTruoc(!showDialogDatTruoc);
-                          updateTrangThaiDatPhong();
+                          console.log(valueIdDatPhong);
+                          updateTrangThaiDatPhong(valueIdDatPhong);
                         }
                       }}
                     >
