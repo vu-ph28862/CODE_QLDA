@@ -12,7 +12,9 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ManHinhLogin(props) {
-  const hostname = "192.168.1.7";
+  // const hostname = "192.168.1.7";//long
+  const hostname = '192.168.126.1'; //hantnph28876
+
   const [userName,setUsername] = useState("");
   const [passWord,setPassword] = useState("");
 
