@@ -2,15 +2,23 @@ import { StyleSheet, Text, View , SafeAreaView , Image } from 'react-native'
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react'
 //rnfs : tạo sẵn 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function ManHinhChao({navigation}){
 
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      console.log(token);
+      if (token) {
+        navigation.navigate('Menu');
+      } else {
+        navigation.navigate('Màn Hình Đăng Nhập');
+      }
+    };
     useEffect(() => {
-      const timer = setTimeout(() => {
-      navigation.replace('Màn Hình Đăng Nhập');
-      // navigation.openDrawer()
-    }, 3000);
-    return () => clearTimeout(timer);
-    })
+      setTimeout(() => {
+          checkToken();
+      } , 2000 )
+    }, [])
 
   return (
     <SafeAreaView style={styles.container}>

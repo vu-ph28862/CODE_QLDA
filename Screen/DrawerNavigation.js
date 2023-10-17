@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View , Image, SafeAreaView } from 'react-native';
-import React from 'react'
+import React , {useEffect} from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { NavigationContainer } from '@react-navigation/native';
-import { DrawerItemList,createDrawerNavigator } from '@react-navigation/drawer';
+import { DrawerItemList,createDrawerNavigator , DrawerContentScrollView, } from '@react-navigation/drawer';
+
 const Drawer = createDrawerNavigator();
 import { Feather , MaterialIcons , FontAwesome , Fontisto ,MaterialCommunityIcons  ,Ionicons ,SimpleLineIcons,Foundation
     } from '@expo/vector-icons';
@@ -17,7 +18,23 @@ import DichVu from './DichVuScreen';
 import KhachHangScreen from './KhachHangScreen';
 import NhanVienScreen from './NhanVienScreen';
 import BaoCaoThongKe from './BaoCaoThongKe';
-export default function DrawerNavigation() {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+export default function DrawerNavigation({navigation}) {
+  const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      console.log(token);
+    };
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Màn Hình Đăng Nhập');
+  };
+
+  useEffect(() => {
+    checkToken();
+  },[])
   return (
    
         <Drawer.Navigator
@@ -63,6 +80,19 @@ export default function DrawerNavigation() {
                   
                 </View>
                 <DrawerItemList {...props} />
+                <TouchableOpacity 
+                style={{
+                  backgroundColor: '#fff',
+                  flexDirection:"row",
+                  margin:15,
+                  alignItems:"center"
+                }}
+                
+                onPress={handleLogout}>
+                  <MaterialCommunityIcons name="logout" size={30} color="black" />
+                  <Text style={{marginLeft:30 , color: "#111" , fontWeight: "500",
+                    fontSize:14}}>Đăng Xuất</Text>
+                  </TouchableOpacity>
               </SafeAreaView>
             )
           }
@@ -86,7 +116,7 @@ export default function DrawerNavigation() {
             color: "#111"
           },
         }}
-        initialRouteName="Đặt Phòng"
+        initialRouteName="Màn Hình Chính"
         >
         <Drawer.Screen name="Màn Hình Chính"
         options={{
@@ -164,7 +194,7 @@ export default function DrawerNavigation() {
             )
           }}
          />
-         <Drawer.Screen name="Đăng Xuất" 
+         {/* <Drawer.Screen name="Đăng Xuất" 
          component={ManHinhLogin}
           options={{
             drawerLabel: "Đăng Xuất",
@@ -172,12 +202,19 @@ export default function DrawerNavigation() {
             drawerIcon: () => (
               <MaterialCommunityIcons name="logout" size={24} color="black" />
             ),
-            headerShown: false, gestureEnabled: false
+            headerShown: false, gestureEnabled: false,
+            onPress: async () => {
+              try {
+                await AsyncStorage.removeItem('token');
+                console.log('Token removed successfully.');
+              } catch (error) {
+                console.error("Lỗi xóa token: ", error);
+              }
+            },
           }}
-        
-         />
+         /> */}
       </Drawer.Navigator>
-    
+       
   )
 }
 
