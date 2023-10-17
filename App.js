@@ -14,14 +14,15 @@ import DrawerNavigation from './Screen/DrawerNavigation';
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Menu' screenOptions={{ headerShown: false, gestureEnabled: false }}>
+      <Stack.Navigator initialRouteName='Màn Hình Chào' screenOptions={{ headerShown: false, gestureEnabled: false }}>
         <Stack.Screen name='Màn Hình Chào' component={ManHinhChao} />
+        
         <Stack.Screen name='Màn Hình Đăng Nhập' component=
         {ManHinhLogin}/>
-        <Stack.Screen name='Màn Hình Chính' component= {ManHinhChinh}
+        {/* <Stack.Screen name='Màn Hình Chính' component= {ManHinhChinh}
         options={{ headerShown: false, gestureEnabled: false }}/>
 
-        <Stack.Screen name='Quản Lý Phòng' component={QuanLyPhong} options={{ headerShown: false, gestureEnabled: false }}/>
+        <Stack.Screen name='Quản Lý Phòng' component={QuanLyPhong} options={{ headerShown: false, gestureEnabled: false }}/> */}
         <Stack.Screen name='Menu' component={DrawerNavigation}
         />
 

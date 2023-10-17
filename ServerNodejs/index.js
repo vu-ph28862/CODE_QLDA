@@ -4,7 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
-
+const jwt = require('jsonwebtoken');
 require('./models/LoaiPhong')
 require('./models/Phong')
 require('./models/NhanVien')
@@ -487,6 +487,23 @@ app.post('/insertHoaDonDatPhong', (req,res) => {
     res.send(data)
   }).catch(err => {console.log(err)})
 })
+
+app.post('/api/login', async (req, res) => {
+  try {
+  const { sdt, matKhau } = req.body;
+  const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau });
+  const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2&mZpR6L$%wK");
+  res.json({ token }); 
+  if (user) {
+    console.log("Đăng nhập thành công")
+  } else {
+     return res.status(401).json({ message: 'username hoặc mật khẩu không đúng' });
+  }
+  } catch (error) {
+    console.log(error)
+  }
+  
+});
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
 app.listen(port, hostname, () => {
