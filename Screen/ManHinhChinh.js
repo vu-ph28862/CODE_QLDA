@@ -1,6 +1,9 @@
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from "expo-status-bar";
+import moment from 'moment';
+
+
 const styles = StyleSheet.create({
   root: { flex: 1 },
   container: { flex: 1, justifyContent: "flex-start" },
@@ -16,6 +19,42 @@ const styles = StyleSheet.create({
   },
 });
 export default function ManHinhChinh() {
+
+  const hostname = '192.168.126.1'; //hantnph28876 
+
+  const currentDate = new Date();
+  const formattedDate = moment(currentDate).format('DD-MM-YYYY');
+
+  const [doanhThu, setDoanhThu] = useState(0);
+
+  
+  
+  useEffect(() => {
+    getDoanhThu(formattedDate);
+  }, []);
+
+  // tính doanh thu
+  const getDoanhThu = (date) => {
+    var raw = "";
+    
+    var requestOptions = {
+      method: 'GET',
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(`http://${hostname}:3000/doanhThuTrongNgay?ngayTao=${date}`, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        if (result) {
+          setDoanhThu(result);
+          
+          
+        }
+      })
+      .catch(error => console.log('error', error));
+  }
+
   return (
     <View style={styles.root}>
       <StatusBar hidden />
@@ -74,7 +113,7 @@ export default function ManHinhChinh() {
             Doanh Thu Ngày Hôm Nay
           </Text>
           <Text style={{ textAlign: "right", fontSize: 16, fontWeight: 500 }}>
-            Tổng tiền: 0
+            Tổng tiền: {doanhThu} VND
           </Text>
         </View>
       </ImageBackground>

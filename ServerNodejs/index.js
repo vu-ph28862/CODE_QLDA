@@ -508,7 +508,7 @@ app.post('/api/login', async (req, res) => {
   }
   
 });
-//server thống kê doanh thu
+//server thống kê doanh thu theo khoảng thời gian
 app.get('/doanhThu', async (req, res) => {
   try {
       const startDate = req.query.startDate;
@@ -516,6 +516,28 @@ app.get('/doanhThu', async (req, res) => {
 
       const revenueData = await HoaDon.find({
         ngayTao: { $gte: startDate, $lte: endDate }
+      })
+      
+      
+      // Tính tổng doanh thu
+      const totalRevenue = revenueData.reduce((tongDoanhThu, hoaDon) => parseInt(tongDoanhThu)+ parseInt(hoaDon.tongTienHoaDon) , 0);
+
+      // res.json({ hoaDon: revenueData, totalRevenue });
+      res.json(totalRevenue);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+//server thống kê doanh thu theo ngày
+app.get('/doanhThuTrongNgay', async (req, res) => {
+  try {
+      const date = req.query.ngayTao;
+      
+
+      const revenueData = await HoaDon.find({
+        ngayTao: date
       })
       
       
