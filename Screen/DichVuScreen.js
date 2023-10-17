@@ -31,7 +31,9 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 
 export default function DichVu() {
-  const hostname = "192.168.1.6";
+  // const hostname = "192.168.1.6";//long
+  const hostname = '192.168.126.1'; //hantnph28876
+
   // value compoent
   const [_id, setId] = useState();
   const [tenDichVu, setTenDichVu] = useState("");

@@ -31,8 +31,12 @@ const ChiTietDichVu = mongoose.model("ChiTietDichVu")
 const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
 const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
-const hostname = '192.168.1.4'; //long
+// const hostname = '192.168.1.6'; //long
+const hostname = '192.168.126.1'; //hantnph28876
+
+//const hostname = '192.168.1.4'; //long
 // const hostname = '192.168.126.1'; //hantnph28876
+
 app.use(bodyParser.json())
 
 const mongoURL= 'mongodb+srv://hantnph28876:1234@cluster0.fwxkt48.mongodb.net/QuanLyDuAnAgile'
@@ -503,6 +507,27 @@ app.post('/api/login', async (req, res) => {
     console.log(error)
   }
   
+});
+//server thống kê doanh thu
+app.get('/doanhThu', async (req, res) => {
+  try {
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
+
+      const revenueData = await HoaDon.find({
+        ngayTao: { $gte: startDate, $lte: endDate }
+      })
+      
+      
+      // Tính tổng doanh thu
+      const totalRevenue = revenueData.reduce((tongDoanhThu, hoaDon) => parseInt(tongDoanhThu)+ parseInt(hoaDon.tongTienHoaDon) , 0);
+
+      // res.json({ hoaDon: revenueData, totalRevenue });
+      res.json(totalRevenue);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
