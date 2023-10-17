@@ -12,49 +12,33 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ManHinhLogin(props) {
-  // const hostname = "192.168.1.7";//long
+  const hostname = "192.168.1.4";
   const hostname = '192.168.126.1'; //hantnph28876
-
   const [userName,setUsername] = useState("");
   const [passWord,setPassword] = useState("");
 
-  //check login
-
-  const login = () => {
-    if (userName.length == 0) {
-      alert("Chưa nhập username");
-      return;
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`http://${hostname}:3000/api/login`, {
+        method: 'POST',
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userName, passWord }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.token;
+        console.log(data.token)
+        await AsyncStorage.setItem('token', token);
+        props.navigation.navigate('Menu');
+      } else {
+      }
+    } catch (error) {
+      console.error(error);
     }
-    if (passWord.length == 0) {
-      alert("Chưa nhập password");
-      return;
-    }
-       fetch(`https://64b89a9421b9aa6eb079f300.mockapi.io/nguoidung`)
-       .then((response) => response.json())
-       .then(async result => {
-        console.log(result)
-            if(!result){
-                Alert.alert('Thông báo!', 'Tài khoản không tồn tại');
-            }else if(result[0].password != passWord ){
-                Alert.alert('Thông báo!', 'Sai password');
-            }
-            else if(result[0].username != userName){
-                Alert.alert('Thông báo!', 'Sai username');
-            }else{
-                console.log("Successfully")
-                await AsyncStorage.setItem("token",JSON.stringify(result));
-                props.navigation.navigate('Menu');
-            }
-       })
-       .catch(err => {
-        console.log(err)
-       })
-
-      
-  }
-
-
-  
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -129,7 +113,9 @@ export default function ManHinhLogin(props) {
             padding: 7,
             marginTop: 15,
           }}
-          onPress={login}
+          onPress={() => {
+            handleLogin()
+          }}
         >
           <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
             Login
