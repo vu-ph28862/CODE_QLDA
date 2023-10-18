@@ -226,6 +226,7 @@ export default function NhanVienScreen() {
         console.log(err);
       });
   };
+  
   return (
     <View style={{ flex: 1, opacity: 1 }}>
       <StatusBar hidden={true} />

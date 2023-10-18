@@ -490,22 +490,30 @@ app.post('/insertHoaDonDatPhong', (req,res) => {
   }).catch(err => {console.log(err)})
 })
 
-// app.post('/api/login', async (req, res) => {
-//   try {
-//   const { sdt, matKhau } = req.body;
-//   const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau });
-//   const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2&mZpR6L$%wK");
-//   res.json({ token }); 
-//   if (user) {
-//     console.log("Đăng nhập thành công")
-//   } else {
-//      return res.status(401).json({ message: 'username hoặc mật khẩu không đúng' });
-//   }
-//   } catch (error) {
-//     console.log(error)
-//   }
-  
-// });
+
+app.get('/getHoaDon', async (req,res) => {
+  try {
+    const hoaDon = await HoaDon.find()
+                                    .populate('maCTDV')
+                                    .populate('maDatPhong');
+    res.json(hoaDon);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+//get khách hàng theo mã đặt phòng
+app.get('/getKHTheoMaDatPhong/:id', async (req, res) => {
+  try {
+    const customer = await KhachHang.findById(req.params.id);
+    res.json(customer);
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy khách hàng' });
+  }
+});
+
+//login
+
 app.post('/api/login', async (req, res) => {
   try {
   const { sdt, matKhau } = req.body;
