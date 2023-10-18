@@ -492,6 +492,29 @@ app.post('/insertHoaDonDatPhong', (req,res) => {
   }).catch(err => {console.log(err)})
 })
 
+app.get('/getHoaDon', async (req,res) => {
+  try {
+    const hoaDon = await HoaDon.find()
+                                    .populate('maCTDV')
+                                    .populate('maDatPhong');
+    res.json(hoaDon);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+//get khách hàng theo mã đặt phòng
+app.get('/getKHTheoMaDatPhong/:id', async (req, res) => {
+  try {
+    const customer = await KhachHang.findById(req.params.id);
+    res.json(customer);
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lấy khách hàng' });
+  }
+});
+
+//login
+
 app.post('/api/login', async (req, res) => {
   try {
   const { sdt, matKhau } = req.body;
