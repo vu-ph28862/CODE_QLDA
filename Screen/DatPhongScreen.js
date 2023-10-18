@@ -43,9 +43,9 @@ import moment from "moment";
 export default function QuanLyDatPhong({route}) {
 
   // const hostname = "192.168.1.6"; //long
-  const hostname = '192.168.126.1'; //hantnph28876
+  // const hostname = '192.168.126.1'; //hantnph28876
 
-  //const hostname = "192.168.1.4"; //long
+  const hostname = "192.168.1.4"; //long
 
 
 
@@ -61,7 +61,7 @@ export default function QuanLyDatPhong({route}) {
   const [listDatPhong, setListDatPhong] = useState([]);
   const [listDichVu, setListDichVu] = useState([]);
   const [listPhieuDichVu , setListPhieuDichVu] = useState([]);
-  const [listNhanVien , setListNhanVien ] = useState([]);
+  const [listNhanVien , setListNhanVien] = useState([]);
   //mã loại dịch vụ
   const [selectDichVu, setSelectDichVu] = useState();
   const [selectKhachHang, setSelectKhachHang] = useState();
@@ -272,7 +272,7 @@ export default function QuanLyDatPhong({route}) {
       thoiGianDen:selectedStartDate,
       thoiGianTra:selectedEndDate,
       thoiGianThue: soNgayThue,
-      tinhTrang: "Đặt trước",
+      tinhTrang: "Đặt Trước",
       maKhachHang: selectKhachHang,
       maPhong: selectPhong,
       tongTien:tongTienPhong,
@@ -288,7 +288,6 @@ export default function QuanLyDatPhong({route}) {
     console.log(datPhong);
     getListDatPhong();
     setModalVisible(!modalVisible);
-    Alert.alert("Thêm thành công");
     //thêm thành công sẽ sửa trạng thái
     updateTrangThaiPhong(selectPhong)
     setTinhTrang("");
@@ -304,7 +303,7 @@ export default function QuanLyDatPhong({route}) {
       thoiGianDen:selectedStartDate,
       thoiGianTra:selectedEndDate,
       thoiGianThue: soNgayThue,
-      tinhTrang: "Đang thuê",
+      tinhTrang: "Đang Thuê",
       maKhachHang: selectKhachHang,
       maPhong: selectPhong,
       tongTien:tongTienPhong,
@@ -320,7 +319,6 @@ export default function QuanLyDatPhong({route}) {
     console.log("value insert dat phong: "+datPhong);
     getListDatPhong();
     setModalVisible(!modalVisible);
-    Alert.alert("Thêm thành công");
     //thêm thành công sẽ sửa trạng thái
     updateTrangThaiPhong(selectPhong)
     setSoNgayThue("");
@@ -371,35 +369,6 @@ export default function QuanLyDatPhong({route}) {
     }
     setItemQuantities(updatedItemQuantities);
   }
-  
-  //   if (currentRoom) {
-
-  //     // Sao chép danh sách đã chọn cho phòng hiện tại từ state
-  //     const updatedSelectedItems = { ...selectedItemsByRoom };
-
-  //     // Kiểm tra xem danh sách đã chọn cho phòng hiện tại đã tồn tại chưa
-  //     if (!(currentRoom.id in updatedSelectedItems)) {
-  //       updatedSelectedItems[currentRoom.id] = [];
-  //     }
-
-  //     // Tìm vị trí của mục trong danh sách đã chọn cho phòng hiện tại (nếu có)
-  //     const itemIndex = updatedSelectedItems[currentRoom.id].findIndex(
-  //       (selectedItem) => selectedItem._id === item._id
-  //     );
-
-  //     // Nếu mục chưa được chọn cho phòng hiện tại, thêm vào danh sách đã chọn
-  //     if (itemIndex === -1) {
-  //       updatedSelectedItems[currentRoom.id].push(item);
-  //     } else {
-  //       // Nếu mục đã được chọn cho phòng hiện tại, loại bỏ khỏi danh sách đã chọn
-  //       updatedSelectedItems[currentRoom.id].splice(itemIndex, 1);
-  //     }
-
-  //     // Cập nhật state với danh sách đã chọn mới
-  //     setSelectedItemsByRoom(updatedSelectedItems);
-  //   }
-  // };
-
   const calculateTotalPrice = () => {
     let total = 0;
     for (const item of listDichVu) {
@@ -461,7 +430,6 @@ export default function QuanLyDatPhong({route}) {
     });
     console.log("value insert phieu dich vu: "+phieuDichVu);
     setShowDiaLogChiTietNhanPhong(!showDialogChiTietNhanPhong)
-    Alert.alert("Thêm thành công");
     
     //thêm thành công sẽ sửa trạng thái
     setItemQuantities({});
@@ -552,6 +520,7 @@ export default function QuanLyDatPhong({route}) {
     setShowDiaLogDatTruoc(!showDialogDatTruoc)
     Alert.alert("Hủy đặt phòng thành công");
     updateTraPhong(maPhong);
+    updateTrangThaiHuyDat(valueIdDatPhong)
   }
   const updateTraPhong = (maPhong) => {
         const phong = {
@@ -576,32 +545,57 @@ export default function QuanLyDatPhong({route}) {
             })
             .catch(error => console.log('error', error));
   }
-
+  const [tinhTrangDatPhong, setTinhTrangDatPhong] = useState("");
   //update trạng thái nhận phòng
   const updateTrangThaiDatPhong = (valueIdDatPhong) => {
     const datPhong = {
-      tinhTrang:"Đang thuê"
+      tinhTrang:tinhTrangDatPhong
     }
     var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        var requestOptions = {
-            method: 'PUT',
-            headers: myHeaders,
-            body: JSON.stringify(datPhong),
-        };
+    myHeaders.append("Content-Type", "application/json");
+    var requestOptions = {
+    method: 'PUT',
+    headers: myHeaders,
+    body: JSON.stringify(datPhong),
+    };
 
-        fetch(`http://${hostname}:3000/updateTrangThaiDatPhong/${valueIdDatPhong}`, requestOptions)
-            .then(response => {
-                response.json()
-              })
-            .then(result => {
-                console.log("value update trang thai dat phong: "+result)
-                alert("thanh cong")
-                getListDatPhong();
-                setValueIdDatPhong(0);
-            })
-            .catch(error => console.log('error', error));
+    fetch(`http://${hostname}:3000/updateTrangThaiDatPhong/${valueIdDatPhong}`, requestOptions)
+    .then(response => {
+    response.json()
+    })
+    .then(result => {
+    console.log("value update trang thai dat phong: "+result)
+    getListDatPhong();
+    setValueIdDatPhong(0);
+    })
+    .catch(error => console.log('error', error));
   }
+
+  //update hủy đặt phòng
+  const updateTrangThaiHuyDat = (valueIdDatPhong) => {
+    const datPhong = {
+      tinhTrang:"Hủy"
+    }
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var requestOptions = {
+    method: 'PUT',
+    headers: myHeaders,
+    body: JSON.stringify(datPhong),
+    };
+
+    fetch(`http://${hostname}:3000/updateTrangThaiDatPhong/${valueIdDatPhong}`, requestOptions)
+    .then(response => {
+    response.json()
+    })
+    .then(result => {
+    console.log("value update trang thai dat phong: "+result)
+    getListDatPhong();
+    setValueIdDatPhong(0);
+    })
+    .catch(error => console.log('error', error));
+  }
+
 
   //xem chi tiết
   const [chiTietMaPhong, setChiTietMaPhong] = useState("");
@@ -613,6 +607,21 @@ export default function QuanLyDatPhong({route}) {
     setChiTietTienPhong(chiTietTienPhong);
     setChiTietNgayThue(chiTietNgayThue)
   }
+
+  const getStyleTinhTrang = (tinhTrang) => {
+    switch (tinhTrang) {
+      case "Đang Thuê":
+        return { color: "#08BE25" };
+      case "Đặt Trước":
+        return { color: "#FF9900" };
+      case "Đã Trả Phòng":
+        return { color: 'blue' };
+        case "Hủy":
+        return { color: 'red' , textDecorationLine: 'line-through', textDecorationStyle: 'solid' };
+      default:
+        return { color: '#000' };
+    }
+  };
   return (
     <View style={{ flex: 1, opacity: 1 }}>
       <StatusBar hidden={true} />
@@ -657,7 +666,10 @@ export default function QuanLyDatPhong({route}) {
           style={{ flex: 0.9, width: "90%", alignSelf: "center" }}
           data={listDatPhong}
           keyExtractor={(item, index) => item._id}
-          onRefresh={() => getListDatPhong()}
+          onRefresh={() => {getListDatPhong()
+            getListPhong()
+            getListKhachHang()
+          }}
           refreshing={false}
           renderItem={({ item }) => (
             <View
@@ -702,7 +714,11 @@ export default function QuanLyDatPhong({route}) {
                   <Text style={styles.textStyle }>
                   Trạng Thái:
                   </Text>
-                  <Text style={[styles.textStyle , { color: item.tinhTrang === 'Đặt trước' ? '#FF0000' : '#388EBB'}]}>
+                  <Text 
+                  // style={[styles.textStyle , { color: item.tinhTrang === 'Đặt trước' ? '#FF0000' : '#388EBB'}]}
+                  style={[styles.textStyle ,  getStyleTinhTrang(item.tinhTrang)]}
+
+                  >
                   {"\t"}{ item.tinhTrang}
                   </Text>
                 </View>
@@ -716,13 +732,27 @@ export default function QuanLyDatPhong({route}) {
                   infoPhong(item.maPhong._id , item._id , item.tongTien);
                   onItemClick(item.maPhong?._id)
                   console.log(item.maPhong?._id);
+
                   infoChiTietPhong(item.maPhong.tenPhong , item.thoiGianThue , item.tongTien)
                   //đặt trước
-                  if(item.tinhTrang === 'Đặt trước'){
+                  if(item.tinhTrang === 'Đặt Trước'){
                     setShowDiaLogDatTruoc(true)
-                  }else{
+                    setTinhTrangDatPhong("Đang Thuê")
+                    console.log(tinhTrangDatPhong);
+                  }else if(item.tinhTrang === 'Đã Trả Phòng'){
+                    console.log(null);
+                    setShowDiaLogDatTruoc(false)
+                    setShowDiaLogNhanPhong(false);
+                  }else if(item.tinhTrang === 'Hủy'){
+                    console.log(null);
+                    setShowDiaLogDatTruoc(false)
+                    setShowDiaLogNhanPhong(false);
+                  }
+                  else{
                     //nhận phòng
                     setShowDiaLogNhanPhong(true);
+                    setTinhTrangDatPhong("Đã Trả Phòng")
+                    console.log(tinhTrangDatPhong);
                   }
                 }}
               >
@@ -838,18 +868,6 @@ export default function QuanLyDatPhong({route}) {
                       </Picker>
                     </View>
 
-                    {/* <View
-                      style={{
-                        flexDirection: "row",
-                        margin: 10,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <View style={[styles.dropdown, { flex: 1 }]}>
-                      </View>
-                     
-                    </View> */}
                     {/* //thời gian nhận phòng  */}
                     <View style={styles.inputStyle}>
                       <TouchableOpacity
@@ -1200,6 +1218,9 @@ export default function QuanLyDatPhong({route}) {
                       onPress={() => {
                         {
                             insertHoaDonThanhToan();
+                            console.log("value ID dat phong: "+ valueIdDatPhong);
+                            updateTrangThaiDatPhong(valueIdDatPhong);
+                            console.log(tinhTrangDatPhong);
                         }
                       }}
                     >
@@ -1261,6 +1282,7 @@ export default function QuanLyDatPhong({route}) {
                       onPress={() => {
                         setShowDiaLogDatTruoc(!showDialogDatTruoc);
                         insertHoaDonHuy();
+                        
                       }}
                     >
                       <Text style={{ color: "#fff" }}>Hủy Đặt Phòng</Text>
@@ -1271,8 +1293,9 @@ export default function QuanLyDatPhong({route}) {
                       onPress={() => {
                         {
                           setShowDiaLogDatTruoc(!showDialogDatTruoc);
-                          console.log(valueIdDatPhong);
+                          console.log("value ID dat phong: "+ valueIdDatPhong);
                           updateTrangThaiDatPhong(valueIdDatPhong);
+                          console.log(tinhTrangDatPhong);
                         }
                       }}
                     >

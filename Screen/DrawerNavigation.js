@@ -21,11 +21,11 @@ import BaoCaoThongKe from './BaoCaoThongKe';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-export default function DrawerNavigation({navigation}) {
+export default function DrawerNavigation({navigation}) { 
   const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
       console.log(token);
-    };
+  };
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
