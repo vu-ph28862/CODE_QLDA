@@ -3,6 +3,10 @@ import React ,
 {useEffect, useState} from "react";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useEffect } from 'react';
+import { StatusBar } from "expo-status-bar";
+import moment from 'moment';
+
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
@@ -82,6 +86,42 @@ export default function ManHinhChinh() {
     getListPhong();
     getListDatPhong();
   },[])
+
+  const hostname = '192.168.126.1'; //hantnph28876 
+
+  const currentDate = new Date();
+  const formattedDate = moment(currentDate).format('DD-MM-YYYY');
+
+  const [doanhThu, setDoanhThu] = useState(0);
+
+  
+  
+  useEffect(() => {
+    getDoanhThu(formattedDate);
+  }, []);
+
+  // tính doanh thu
+  const getDoanhThu = (date) => {
+    var raw = "";
+    
+    var requestOptions = {
+      method: 'GET',
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(`http://${hostname}:3000/doanhThuTrongNgay?ngayTao=${date}`, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        if (result) {
+          setDoanhThu(result);
+          
+          
+        }
+      })
+      .catch(error => console.log('error', error));
+  }
+
   return (
     <View style={styles.root}>
       <StatusBar hidden />
@@ -181,6 +221,13 @@ export default function ManHinhChinh() {
           <Text style={{textAlign:"left"}}>Phòng Đang Thuê</Text>
           <Text style={{textAlign:"right"}}>Số lượng: {soLuongDangThue}</Text>
          </View>
+        <View style={styles.cardView}>
+          <Text style={{ fontSize: 16, fontWeight: 500 }}>
+            Doanh Thu Ngày Hôm Nay
+          </Text>
+          <Text style={{ textAlign: "right", fontSize: 16, fontWeight: 500 }}>
+            Tổng tiền: {doanhThu} VND
+          </Text>
         </View>
       </ImageBackground>
     </View>

@@ -550,6 +550,7 @@ app.get('/api/nhanvien', async (req, res) => {
   }
 });
 //server thống kê doanh thu
+//server thống kê doanh thu theo khoảng thời gian
 app.get('/doanhThu', async (req, res) => {
   try {
       const startDate = req.query.startDate;
@@ -584,6 +585,27 @@ app.get('/api/soLuongPhongTrong', (req, res) => {
   });
 });
 
+//server thống kê doanh thu theo ngày
+app.get('/doanhThuTrongNgay', async (req, res) => {
+  try {
+      const date = req.query.ngayTao;
+      
+
+      const revenueData = await HoaDon.find({
+        ngayTao: date
+      })
+      
+      
+      // Tính tổng doanh thu
+      const totalRevenue = revenueData.reduce((tongDoanhThu, hoaDon) => parseInt(tongDoanhThu)+ parseInt(hoaDon.tongTienHoaDon) , 0);
+
+      // res.json({ hoaDon: revenueData, totalRevenue });
+      res.json(totalRevenue);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // app.listen(3000, "192.168.1.135"); // e.g. app.listen(3000, "192.183.190.3");
 app.listen(port, hostname, () => {
