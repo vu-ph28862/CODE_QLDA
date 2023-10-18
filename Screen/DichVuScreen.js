@@ -31,8 +31,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 
 export default function DichVu() {
-  // const hostname = "192.168.1.6";//long
-  const hostname = '192.168.126.1'; //hantnph28876
+  const hostname = "192.168.1.4";//long
+  // const hostname = '192.168.126.1'; //hantnph28876
 
   // value compoent
   const [_id, setId] = useState();
@@ -73,6 +73,7 @@ export default function DichVu() {
       .then((res) => {
         if (res) {
           setMaLoaiDichVu(res);
+          setListLoaiDichVu(res);
         }
       })
       .catch((err) => {
@@ -152,8 +153,8 @@ export default function DichVu() {
       .then((result) => console.log(result))
       .catch((error) => console.log("error", error));
     Alert.alert("Them thanh cong");
-    setModalVisible(!modalVisible);
     getListDichVu();
+    setModalVisible(!modalVisible);
     setTenDichVu("");
     setGiaDichVu("");
     setPicture("");
@@ -377,7 +378,9 @@ export default function DichVu() {
             style={{ flex: 1, width: "95%", alignSelf: "center" }}
             data={listDichVu}
             keyExtractor={(item, index) => item._id}
-            onRefresh={() => getListDichVu()}
+            onRefresh={() => {getListDichVu()
+              getListLoaiDichVu()
+            }}
             refreshing={false}
             renderItem={({ item }) => (
               <View

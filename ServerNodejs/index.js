@@ -31,10 +31,8 @@ const ChiTietDichVu = mongoose.model("ChiTietDichVu")
 const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
 const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
-// const hostname = '192.168.1.6'; //long
-const hostname = '192.168.126.1'; //hantnph28876
 
-//const hostname = '192.168.1.4'; //long
+const hostname = '192.168.1.4'; //long
 // const hostname = '192.168.126.1'; //hantnph28876
 
 app.use(bodyParser.json())
@@ -492,6 +490,7 @@ app.post('/insertHoaDonDatPhong', (req,res) => {
   }).catch(err => {console.log(err)})
 })
 
+
 app.get('/getHoaDon', async (req,res) => {
   try {
     const hoaDon = await HoaDon.find()
@@ -518,19 +517,47 @@ app.get('/getKHTheoMaDatPhong/:id', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
   const { sdt, matKhau } = req.body;
-  const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau });
-  const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2&mZpR6L$%wK");
-  res.json({ token }); 
+
+  const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau});
   if (user) {
+  const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2mZpR6L$%wK");
+  res.json({token}); 
     console.log("Đăng nhập thành công")
   } else {
-     return res.status(401).json({ message: 'username hoặc mật khẩu không đúng' });
+     return res.json({ success: false, message: 'Số điện thoại hoặc mật khẩu không đúng' });
   }
   } catch (error) {
     console.log(error)
   }
   
 });
+
+app.get('/api/nhanvien', async (req, res) => {
+  const token = req.header('x-auth-token'); // Lấy token từ header hoặc request body
+
+  if (!token) {
+    return res.status(401).json({ message: 'Không có token, truy cập bị từ chối' });
+  }
+
+  try {
+    // Xác minh và giải mã token
+    const decoded = jwt.verify(token, "e#L7^9@Tq2mZpR6L$%wK");
+    const userId = decoded.userId;
+
+    // Truy vấn cơ sở dữ liệu để lấy thông tin nhân viên
+    const nhanVien = await NhanVien.findById(userId);
+
+    if (!nhanVien) {
+      return res.status(404).json({ message: 'Không tìm thấy nhân viên' });
+    }
+
+    res.json(nhanVien);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Lỗi trong quá trình xử lý token' });
+  }
+});
+//server thống kê doanh thu
 //server thống kê doanh thu theo khoảng thời gian
 app.get('/doanhThu', async (req, res) => {
   try {
@@ -551,6 +578,19 @@ app.get('/doanhThu', async (req, res) => {
       console.error(error);
       res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+
+//tổng số lượng phòng trống
+app.get('/api/soLuongPhongTrong', (req, res) => {
+  Phong.countDocuments({ tinhTrang: 'Yes' })
+  .then(count => {
+    console.log('Tổng số lượng phòng có tinhTrang là "Còn trống":', count);
+    res.json(count);
+  })
+  .catch(err => {
+    console.error('Lỗi khi thực hiện truy vấn:', err);
+  });
 });
 
 //server thống kê doanh thu theo ngày

@@ -7,38 +7,62 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ManHinhLogin(props) {
-  // const hostname = "192.168.1.4";
-  const hostname = '192.168.126.1'; //hantnph28876
+  const hostname = "192.168.1.4";
+  // const hostname = '192.168.126.1'; //hantnph28876
   const [userName,setUsername] = useState("");
   const [passWord,setPassword] = useState("");
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch(`http://${hostname}:3000/api/login`, {
-        method: 'POST',
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userName, passWord }),
+  const [listNhanVien , setListNhanVien] = useState([]);
+  const getListNhanVien = () => {
+    fetch(`http://${hostname}:3000/getNhanVien`, {
+      method: "GET",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res) {
+          setListNhanVien(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       });
-      if (response.ok) {
-        const data = await response.json();
-        const token = data.token;
-        console.log(data.token)
-        await AsyncStorage.setItem('token', token);
-        props.navigation.navigate('Menu');
-      } else {
-      }
-    } catch (error) {
-      console.error(error);
-    }
   };
+   useEffect(() => {
+    getListNhanVien();
+  }, []);
+  const handleLogin = async () => {
+  try {
+    const response = await fetch(`http://${hostname}:3000/api/login`, {
+      method: 'POST',
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userName, passWord }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const token = data.token;
+      console.log(data.token);
+      const selectedData = listNhanVien.find((item) => item.sdt === userName);
+      const selectedValue = selectedData ? selectedData.tenNhanVien : "";
+      console.log(selectedValue)
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('nhanVienInfo', selectedValue);
+      props.navigation.navigate('Menu' );
+    } else {
+      console.log("Dang nhap khong thanh cong");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <View style={styles.container}>
       <Image
