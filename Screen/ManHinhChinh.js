@@ -1,10 +1,7 @@
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
-import React , 
-{useEffect, useState} from "react";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from 'react';
-import { StatusBar } from "expo-status-bar";
 import moment from 'moment';
 
 
@@ -24,36 +21,37 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 15,
     borderRadius: 10,
-    width:160,
-    
+    width: 160,
+
   },
 });
 export default function ManHinhChinh() {
-  const [tenNhanVien , setTenNhanVien ] = useState("");
-  const [listPhong , setListPhong] = useState([]);
-  const [listDatPhong , setListDatPhong] = useState([]);
-  const hostname = "192.168.1.4"; //long
+  const [tenNhanVien, setTenNhanVien] = useState("");
+  const [listPhong, setListPhong] = useState([]);
+  const [listDatPhong, setListDatPhong] = useState([]);
+  // const hostname = "192.168.1.4"; //long
+  const hostname = '192.168.126.1'; //hantnph28876 
   const thongTinNhanVien = async () => {
     const nhanVienInfo = await AsyncStorage.getItem('nhanVienInfo');
     setTenNhanVien(nhanVienInfo);
     console.log(nhanVienInfo);
   };
   const getListPhong = () => {
-        var requestOptions = {
-            method: 'GET',
-            redirect: 'follow'
-        };
+    var requestOptions = {
+      method: 'GET',
+      redirect: 'follow'
+    };
 
-        fetch(`http://${hostname}:3000/getPhong`, requestOptions)
-            .then(response => response.json())
-            .then(res => {
-                if (res) {
-                    console.log(res)
-                    setListPhong(res)
-                }
+    fetch(`http://${hostname}:3000/getPhong`, requestOptions)
+      .then(response => response.json())
+      .then(res => {
+        if (res) {
+          console.log(res)
+          setListPhong(res)
+        }
 
-            })
-            .catch(error => console.log('error', error));
+      })
+      .catch(error => console.log('error', error));
   }
   const getListDatPhong = () => {
     fetch(`http://${hostname}:3000/getDatPhong`, {
@@ -72,30 +70,30 @@ export default function ManHinhChinh() {
       });
   };
   //số lượng phòng trống
-      const phongTrong = listPhong.filter((phong) => phong.tinhTrang === 'Yes');
-      const soLuongPhongTrong = phongTrong.length;
+  const phongTrong = listPhong.filter((phong) => phong.tinhTrang === 'Yes');
+  const soLuongPhongTrong = phongTrong.length;
 
   //số lượng đặt phòng
-      const datPhong = listDatPhong.filter((datPhong) => datPhong.tinhTrang === 'Đặt Trước')
-      const soLuongDaThue = datPhong.length;
+  const datPhong = listDatPhong.filter((datPhong) => datPhong.tinhTrang === 'Đặt Trước')
+  const soLuongDaThue = datPhong.length;
   //số lượng phòng đang thuê
-      const dangThue = listDatPhong.filter((dangThue) => dangThue.tinhTrang === "Đang Thuê")
-      const soLuongDangThue = dangThue.length;
+  const dangThue = listDatPhong.filter((dangThue) => dangThue.tinhTrang === "Đang Thuê")
+  const soLuongDangThue = dangThue.length;
   useEffect(() => {
     thongTinNhanVien();
     getListPhong();
     getListDatPhong();
-  },[])
+  }, [])
 
-  const hostname = '192.168.126.1'; //hantnph28876 
+
 
   const currentDate = new Date();
   const formattedDate = moment(currentDate).format('DD-MM-YYYY');
 
   const [doanhThu, setDoanhThu] = useState(0);
 
-  
-  
+
+
   useEffect(() => {
     getDoanhThu(formattedDate);
   }, []);
@@ -103,7 +101,7 @@ export default function ManHinhChinh() {
   // tính doanh thu
   const getDoanhThu = (date) => {
     var raw = "";
-    
+
     var requestOptions = {
       method: 'GET',
       body: raw,
@@ -115,8 +113,8 @@ export default function ManHinhChinh() {
       .then(result => {
         if (result) {
           setDoanhThu(result);
-          
-          
+
+
         }
       })
       .catch(error => console.log('error', error));
@@ -154,80 +152,81 @@ export default function ManHinhChinh() {
               style={{ width: 50, height: 50, borderRadius: 20, margin: 20 }}
               source={require("../assets/avtPerson.png")}
             />
-            <View style={{alignSelf:"center"}}>
+            <View style={{ alignSelf: "center" }}>
               <Text style={{ fontSize: 16, fontWeight: 700 }}>Họ Tên: {tenNhanVien}</Text>
-              <View style={{flexDirection:"row" , alignItems:"center"}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Image
-                  style={{ width: 10, height: 10, borderRadius: 20 , }}
+                  style={{ width: 10, height: 10, borderRadius: 20, }}
                   source={require("../assets/image_66.png")}
                 />
-                <Text style={{fontSize:14 , fontWeight:"400" , marginLeft:10}}>Online</Text>
+                <Text style={{ fontSize: 14, fontWeight: "400", marginLeft: 10 }}>Online</Text>
               </View>
             </View>
 
-            <View style={{flexDirection:"row"  , flex:1 , alignItems:"flex-end" , justifyContent:"flex-end"}}>
+            <View style={{ flexDirection: "row", flex: 1, alignItems: "flex-end", justifyContent: "flex-end" }}>
               <Image
-              style={{ width: 50, height: 50 , }}
-              source={require("../assets/Group_1000003409.png")}
-            />
-            <Image
-              style={{ width: 50, height: 50,  }}
-              source={require("../assets/Group_1000003404.png")}
-            />
+                style={{ width: 50, height: 50, }}
+                source={require("../assets/Group_1000003409.png")}
+              />
+              <Image
+                style={{ width: 50, height: 50, }}
+                source={require("../assets/Group_1000003404.png")}
+              />
             </View>
           </View>
         </View>
 
-          {/* view center  */}
-          <View style={{flexDirection:"row" ,justifyContent:"space-between" , margin:20}}>
-              <View style={[styles.cardView , {justifyContent:"space-around"}]}>
-                <Image
-                  style={{ width: 100, height: 100 , alignSelf:"center" , margin:10 }}
-                  source={require("../assets/image_65.png")}
-                />
-              <Text style={{ fontSize: 14, fontWeight: 500 , textAlign:"center"  }}>Phòng trống: {soLuongPhongTrong}</Text>
-            </View>
-
-            <View style={[styles.cardView , {justifyContent:"space-around"}]}>
-                <Image
-                  style={{ width: 100, height: 100 , alignSelf:"center" , margin:10 }}
-                  source={require("../assets/image_67.png")}
-                />
-              <Text style={{ fontSize: 14, fontWeight: 500 , textAlign:"center" }}>Đặt Phòng: {soLuongDaThue}</Text>
-            </View>
-            
+        {/* view center  */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", margin: 20 }}>
+          <View style={[styles.cardView, { justifyContent: "space-around" }]}>
+            <Image
+              style={{ width: 100, height: 100, alignSelf: "center", margin: 10 }}
+              source={require("../assets/image_65.png")}
+            />
+            <Text style={{ fontSize: 14, fontWeight: 500, textAlign: "center" }}>Phòng trống: {soLuongPhongTrong}</Text>
           </View>
-            
-            {/* view footer  */}
-            <View
+
+          <View style={[styles.cardView, { justifyContent: "space-around" }]}>
+            <Image
+              style={{ width: 100, height: 100, alignSelf: "center", margin: 10 }}
+              source={require("../assets/image_67.png")}
+            />
+            <Text style={{ fontSize: 14, fontWeight: 500, textAlign: "center" }}>Đặt Phòng: {soLuongDaThue}</Text>
+          </View>
+
+        </View>
+
+        {/* view footer  */}
+        <View
           style={{
-          width: "100",
-          backgroundColor: "#F7F8F9",
-          borderRadius: 8,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 4,
-          elevation: 5,
-          padding:10,
-          marginLeft:20,
-          marginRight:20
+            width: "100",
+            backgroundColor: "#F7F8F9",
+            borderRadius: 8,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+            padding: 10,
+            marginLeft: 20,
+            marginRight: 20
           }}
         >
-         <View>
-          <Text style={{textAlign:"left"}}>Phòng Đang Thuê</Text>
-          <Text style={{textAlign:"right"}}>Số lượng: {soLuongDangThue}</Text>
-         </View>
-        <View style={styles.cardView}>
-          <Text style={{ fontSize: 16, fontWeight: 500 }}>
-            Doanh Thu Ngày Hôm Nay
-          </Text>
-          <Text style={{ textAlign: "right", fontSize: 16, fontWeight: 500 }}>
-            Tổng tiền: {doanhThu} VND
-          </Text>
+          <View>
+            <Text style={{ textAlign: "left" }}>Phòng Đang Thuê</Text>
+            <Text style={{ textAlign: "right" }}>Số lượng: {soLuongDangThue}</Text>
+          </View>
+          <View style={styles.cardView}>
+            <Text style={{ fontSize: 16, fontWeight: 500 }}>
+              Doanh Thu Ngày Hôm Nay
+            </Text>
+            <Text style={{ textAlign: "right", fontSize: 16, fontWeight: 500 }}>
+              Tổng tiền: {doanhThu} VND
+            </Text>
+          </View>
         </View>
       </ImageBackground>
     </View>

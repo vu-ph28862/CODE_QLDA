@@ -18,6 +18,8 @@ export default function HoaDonScreen() {
 
   const [listHoaDon, setListHoaDon] = useState([]);
 
+  const [khachHang, setKhachHang] = useState();
+
   const getListHoaDon = () => {
     fetch(`http://${hostname}:3000/getHoaDon`, {
       method: "GET",
@@ -45,7 +47,7 @@ export default function HoaDonScreen() {
       })
       .then((res) => {
         if (res) {
-          
+          setKhachHang(res)
         }
       })
       .catch((err) => {
@@ -104,7 +106,7 @@ export default function HoaDonScreen() {
                 <Text style={styles.textStyle}>
                   Tên nhân viên: {item.maNV}
                 </Text>
-                <Text style={styles.textStyle}>Tổng tiền: {item.tongTienHoaDon}</Text>
+                <Text style={styles.textStyle}>Tổng tiền: {item.tongTienHoaDon} VND</Text>
                 <Text style={styles.textStyle}>Thời gian: {item.maDatPhong.thoiGianDen} - {item.maDatPhong.thoiGianDen}</Text>
                 <Text style={item.trangThai === 'Hoàn tất' ? styles.HoanTat : styles.HuyDatPhong}>{item.trangThai}</Text>
 
