@@ -32,7 +32,7 @@ const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
 const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
 
-const hostname = '192.168.1.4'; //long
+const hostname = '192.168.1.2'; //long
 // const hostname = '192.168.126.1'; //hantnph28876
 
 app.use(bodyParser.json())
@@ -514,47 +514,42 @@ app.get('/getKHTheoMaDatPhong/:id', async (req, res) => {
 
 //login
 
+// app.post('/api/login', async (req, res) => {
+//   try {
+//   const { sdt, matKhau } = req.body;
+
+//   const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau});
+//   if (user) {
+//   const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2mZpR6L$%wK");
+//   res.json({token}); 
+//     console.log("Đăng nhập thành công")
+//   } else {
+//      return res.json({ success: false, message: 'Số điện thoại hoặc mật khẩu không đúng' });
+//   }
+//   } catch (error) {
+//     console.log(error)
+//   }
+
+// });
+
 app.post('/api/login', async (req, res) => {
   try {
-  const { sdt, matKhau } = req.body;
+    const { sdt, matKhau } = req.body;
 
-  const user = await NhanVien.find({ sdt: sdt, matKhau: matKhau});
-  if (user) {
-  const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2mZpR6L$%wK");
-  res.json({token}); 
-    console.log("Đăng nhập thành công")
-  } else {
-     return res.json({ success: false, message: 'Số điện thoại hoặc mật khẩu không đúng' });
-  }
-  } catch (error) {
-    console.log(error)
-  }
-  
-});
+    const user = await NhanVien.findOne({ sdt: sdt, matKhau: matKhau });
+    if (user) {
+      const token = jwt.sign({ userId: user._id }, "e#L7^9@Tq2mZpR6L$%wK");
+      console.log("Đăng nhập thành công");
 
-app.get('/api/nhanvien', async (req, res) => {
-  const token = req.header('x-auth-token'); // Lấy token từ header hoặc request body
+      // Tìm thông tin nhân viên theo ID
+      const nhanVienInfo = await NhanVien.findById(user._id);
 
-  if (!token) {
-    return res.status(401).json({ message: 'Không có token, truy cập bị từ chối' });
-  }
-
-  try {
-    // Xác minh và giải mã token
-    const decoded = jwt.verify(token, "e#L7^9@Tq2mZpR6L$%wK");
-    const userId = decoded.userId;
-
-    // Truy vấn cơ sở dữ liệu để lấy thông tin nhân viên
-    const nhanVien = await NhanVien.findById(userId);
-
-    if (!nhanVien) {
-      return res.status(404).json({ message: 'Không tìm thấy nhân viên' });
+      res.json({"status": true, token, nhanVienInfo });
+    } else {
+      return res.json({ success: false, message: 'Số điện thoại hoặc mật khẩu không đúng' });
     }
-
-    res.json(nhanVien);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Lỗi trong quá trình xử lý token' });
   }
 });
 //server thống kê doanh thu
