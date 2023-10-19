@@ -12,10 +12,11 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ManHinhLogin(props) {
-  const hostname = "192.168.1.4";
+  const hostname = "192.168.1.2";
   // const hostname = '192.168.126.1'; //hantnph28876
   const [userName,setUsername] = useState("");
   const [passWord,setPassword] = useState("");
+  const [chucVu , setChucVu] = useState("Quản lý");
   const [listNhanVien , setListNhanVien] = useState([]);
   const getListNhanVien = () => {
     fetch(`http://${hostname}:3000/getNhanVien`, {
@@ -36,33 +37,43 @@ export default function ManHinhLogin(props) {
    useEffect(() => {
     getListNhanVien();
   }, []);
-  const handleLogin = async () => {
-  try {
-    const response = await fetch(`http://${hostname}:3000/api/login`, {
+
+  const login = async () => {
+    fetch(`http://${hostname}:3000/api/login`, {
       method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+         Accept: "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userName, passWord }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const token = data.token;
-      console.log(data.token);
-      const selectedData = listNhanVien.find((item) => item.sdt === userName);
-      const selectedValue = selectedData ? selectedData.tenNhanVien : "";
-      console.log(selectedValue)
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('nhanVienInfo', selectedValue);
-      props.navigation.navigate('Menu' );
-    } else {
-      console.log("Dang nhap khong thanh cong");
-    }
-  } catch (error) {
-    console.error(error);
+      body: JSON.stringify({ sdt: userName, matKhau: passWord }),
+    })
+      .then((response) => response.json())
+      .then(async (data) =>  {
+
+        if(data.status === true){
+          console.log(data.nhanVienInfo.chucVu); 
+          const token = data.token;
+          const nhanVienToken = data.nhanVienInfo.tenNhanVien;
+          const chucVuToken = data.nhanVienInfo.chucVu;
+          await AsyncStorage.setItem('token', token);
+          await AsyncStorage.setItem('nhanVienToken', nhanVienToken);
+          await AsyncStorage.setItem('chucVuToken', chucVuToken);
+          props.navigation.navigate('Menu');
+        }else{
+          Alert.alert(
+            'Thông báo!',
+            'Tài khoản hoặc Mật khẩu không đúng',
+            [{
+              text: 'OK',
+            }]
+          )
+        }
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
-};
   return (
     <View style={styles.container}>
       <Image
@@ -138,7 +149,7 @@ export default function ManHinhLogin(props) {
             marginTop: 15,
           }}
           onPress={() => {
-            handleLogin()
+            login()
           }}
         >
           <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>

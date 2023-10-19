@@ -1,10 +1,7 @@
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
-import React , 
-{useEffect, useState} from "react";
+import React , {useEffect, useState} from "react";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from "expo-status-bar";
 import moment from 'moment';
 
 
@@ -34,7 +31,7 @@ export default function ManHinhChinh() {
   const [listDatPhong , setListDatPhong] = useState([]);
   const hostname = "192.168.1.4"; //long
   const thongTinNhanVien = async () => {
-    const nhanVienInfo = await AsyncStorage.getItem('nhanVienInfo');
+    const nhanVienInfo = await AsyncStorage.getItem('nhanVienToken');
     setTenNhanVien(nhanVienInfo);
     console.log(nhanVienInfo);
   };
@@ -86,8 +83,6 @@ export default function ManHinhChinh() {
     getListPhong();
     getListDatPhong();
   },[])
-
-  const hostname = '192.168.126.1'; //hantnph28876 
 
   const currentDate = new Date();
   const formattedDate = moment(currentDate).format('DD-MM-YYYY');
@@ -155,7 +150,7 @@ export default function ManHinhChinh() {
               source={require("../assets/avtPerson.png")}
             />
             <View style={{alignSelf:"center"}}>
-              <Text style={{ fontSize: 16, fontWeight: 700 }}>Họ Tên: {tenNhanVien}</Text>
+              <Text style={{ fontSize: 16, fontWeight: 700 }}>{tenNhanVien}</Text>
               <View style={{flexDirection:"row" , alignItems:"center"}}>
                 <Image
                   style={{ width: 10, height: 10, borderRadius: 20 , }}
@@ -221,14 +216,35 @@ export default function ManHinhChinh() {
           <Text style={{textAlign:"left"}}>Phòng Đang Thuê</Text>
           <Text style={{textAlign:"right"}}>Số lượng: {soLuongDangThue}</Text>
          </View>
-        <View style={styles.cardView}>
-          <Text style={{ fontSize: 16, fontWeight: 500 }}>
-            Doanh Thu Ngày Hôm Nay
-          </Text>
-          <Text style={{ textAlign: "right", fontSize: 16, fontWeight: 500 }}>
-            Tổng tiền: {doanhThu} VND
-          </Text>
+        
+            </View>
+
+          <View
+          style={{
+          width: "100",
+          backgroundColor: "#F7F8F9",
+          borderRadius: 8,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
+          padding:10,
+          marginLeft:20,
+          marginRight:20,
+          marginTop:20,
+          }}
+        >
+         <View>
+          <Text style={{textAlign:"left"}}>Doanh Thu Ngày Hôm Nay</Text>
+          <Text style={{textAlign:"right"}}>Tổng tiền: {doanhThu} VND</Text>
+         </View>
         </View>
+      
+        
       </ImageBackground>
     </View>
   );
