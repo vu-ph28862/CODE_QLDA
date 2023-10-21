@@ -32,8 +32,10 @@ const PhieuDatDichVu = mongoose.model("PhieuDatDichVu");
 const HoaDon = mongoose.model("HoaDon")
 const port = 3000;
 
-const hostname = '192.168.1.2'; //long
-// const hostname = '192.168.126.1'; //hantnph28876
+
+//const hostname = '192.168.1.2'; //long
+const hostname = '192.168.126.1'; //hantnph28876
+
 
 app.use(bodyParser.json())
 

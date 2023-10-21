@@ -43,9 +43,11 @@ import moment from "moment";
 export default function QuanLyDatPhong({route}) {
 
   // const hostname = "192.168.1.6"; //long
-  // const hostname = '192.168.126.1'; //hantnph28876
+  const hostname = '192.168.126.1'; //hantnph28876
 
-  const hostname = "192.168.1.2"; //long
+
+  //const hostname = "192.168.1.2"; //long
+
 
 
 

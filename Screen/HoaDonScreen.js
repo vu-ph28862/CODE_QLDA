@@ -21,12 +21,15 @@ import {
 
 export default function HoaDonScreen() {
   //hostname
-  const hostname = "192.168.1.2"; //long
-  // const hostname = '192.168.126.1'; //hantnph28876
+  //const hostname = "192.168.1.2"; //long
+  const hostname = '192.168.126.1'; //hantnph28876
 
   const [listHoaDon, setListHoaDon] = useState([]);
   const [listKhachHang, setListKhachHang] = useState([]);
   const [listPhong, setListPhong] = useState([]);
+
+  //const [khachHang, setKhachHang] = useState();
+  
 
   const getListKhachHang = () => {
     fetch(`http://${hostname}:3000/getKhachHang`, {
@@ -60,6 +63,10 @@ export default function HoaDonScreen() {
         console.log(err);
       });
   };
+
+  
+
+
   const getListHoaDon = () => {
     fetch(`http://${hostname}:3000/getHoaDon`, {
       method: "GET",
@@ -87,6 +94,9 @@ export default function HoaDonScreen() {
       })
       .then((res) => {
         if (res) {
+
+          //setKhachHang(res)
+
         }
       })
       .catch((err) => {
@@ -173,7 +183,10 @@ export default function HoaDonScreen() {
           keyExtractor={(item, index) => item._id}
           onRefresh={() => getListHoaDon()}
           refreshing={false}
+
           renderItem={renderHoaDonItem}
+
+         
         />
       </ImageBackground>
     </SafeAreaView>
