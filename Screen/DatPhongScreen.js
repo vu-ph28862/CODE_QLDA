@@ -45,7 +45,9 @@ export default function QuanLyDatPhong({route}) {
   // const hostname = "192.168.1.6"; //long
   const hostname = '192.168.126.1'; //hantnph28876
 
-  // const hostname = "192.168.1.4"; //long
+
+  //const hostname = "192.168.1.2"; //long
+
 
 
 
@@ -464,7 +466,7 @@ export default function QuanLyDatPhong({route}) {
     );
     if (phieuDatDichVuItem) {
       console.log("Id Phieu Dich Vu "+ phieuDatDichVuItem._id);
-      setValueIdPhieuDichVu(phieuDatDichVuItem);
+      setValueIdPhieuDichVu(phieuDatDichVuItem._id);
       setTongTienDichVu(phieuDatDichVuItem.tongTien);
     }
   }
@@ -496,6 +498,7 @@ export default function QuanLyDatPhong({route}) {
     setShowDiaLogNhanPhong(!showDialogNhanPhong)
     Alert.alert("Thanh toán thành công");
     updateTraPhong(maPhong);
+    setValueIdPhieuDichVu(0);
     setTienDatPhong(0);
     setTongTienDichVu(0);
   }
@@ -574,7 +577,7 @@ export default function QuanLyDatPhong({route}) {
   //update hủy đặt phòng
   const updateTrangThaiHuyDat = (valueIdDatPhong) => {
     const datPhong = {
-      tinhTrang:"Hủy"
+      tinhTrang:"Hủy Đặt"
     }
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -616,7 +619,7 @@ export default function QuanLyDatPhong({route}) {
         return { color: "#FF9900" };
       case "Đã Trả Phòng":
         return { color: 'blue' };
-        case "Hủy":
+        case "Hủy Đặt":
         return { color: 'red' , textDecorationLine: 'line-through', textDecorationStyle: 'solid' };
       default:
         return { color: '#000' };
@@ -743,7 +746,7 @@ export default function QuanLyDatPhong({route}) {
                     console.log(null);
                     setShowDiaLogDatTruoc(false)
                     setShowDiaLogNhanPhong(false);
-                  }else if(item.tinhTrang === 'Hủy'){
+                  }else if(item.tinhTrang === 'Hủy Đặt'){
                     console.log(null);
                     setShowDiaLogDatTruoc(false)
                     setShowDiaLogNhanPhong(false);

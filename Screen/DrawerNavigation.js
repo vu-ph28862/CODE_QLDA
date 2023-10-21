@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View , Image, SafeAreaView } from 'react-native';
-import React , {useEffect} from 'react'
+import React , {useEffect , useState} from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -21,19 +21,38 @@ import BaoCaoThongKe from './BaoCaoThongKe';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-export default function DrawerNavigation({navigation}) { 
+export default function DrawerNavigation({navigation}) {
+  const [tenNhanVien , setTenNhanVien ] = useState("");
+  const [chucVu , setChucVu ] = useState("");
   const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
-      console.log(token);
+      const nhanVienToken  = await AsyncStorage.getItem('nhanVienToken');
+      setTenNhanVien(nhanVienToken);
+      console.log(token + " nhan vien token : "+ nhanVienToken);
   };
-
+  // const checkChucVuToken = async () => {
+  //     const chucVuToken = await AsyncStorage.getItem('chucVuInfo');
+  //     console.log(chucVuToken);
+  //     return checkToken;
+  // };
+  const checkChucVuToken = async () => {
+     const chucVuToken = await AsyncStorage.getItem('chucVuToken');
+    setChucVu(chucVuToken);
+    console.log(chucVu);
+  };
   const handleLogout = async () => {
+    // await AsyncStorage.setItem('token', token);
+    //       await AsyncStorage.setItem('nhanVienToken', nhanVienToken);
+    //       await AsyncStorage.setItem('chucVuToken', chucVuToken);
     await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('nhanVienToken');
+    await AsyncStorage.removeItem('chucVuToken');
     navigation.navigate('Màn Hình Đăng Nhập');
   };
 
   useEffect(() => {
     checkToken();
+    checkChucVuToken();
   },[])
   return (
    
@@ -75,7 +94,7 @@ export default function DrawerNavigation({navigation}) {
                       color: "#111",
                       fontWeight: "bold",
                     }}
-                  >Admin</Text>
+                  >{tenNhanVien}</Text>
                   </View>
                   
                 </View>
@@ -175,9 +194,9 @@ export default function DrawerNavigation({navigation}) {
             )
           }}
          />
-         
-         <Drawer.Screen name="Nhân Viên" component={NhanVienScreen}
-        options={{
+         {chucVu === 'Quản lý' ? (
+          <Drawer.Screen name="Nhân Viên" component={NhanVienScreen}
+            options={{
             drawerLabel: "Nhân Viên",
             title: "Nhân Viên",
             drawerIcon: () => (
@@ -185,6 +204,7 @@ export default function DrawerNavigation({navigation}) {
             )
           }}
          />
+        ) : null}
          <Drawer.Screen name="Báo Cáo Thống Kê" component={BaoCaoThongKe}
         options={{
             drawerLabel: "Báo Cáo Thống Kê",
@@ -194,25 +214,6 @@ export default function DrawerNavigation({navigation}) {
             )
           }}
          />
-         {/* <Drawer.Screen name="Đăng Xuất" 
-         component={ManHinhLogin}
-          options={{
-            drawerLabel: "Đăng Xuất",
-            title: "Đăng Xuất",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="logout" size={24} color="black" />
-            ),
-            headerShown: false, gestureEnabled: false,
-            onPress: async () => {
-              try {
-                await AsyncStorage.removeItem('token');
-                console.log('Token removed successfully.');
-              } catch (error) {
-                console.error("Lỗi xóa token: ", error);
-              }
-            },
-          }}
-         /> */}
       </Drawer.Navigator>
        
   )
